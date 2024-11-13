@@ -4,10 +4,22 @@ from pydantic import BaseModel, Field
 
 
 class ProductsSchema(BaseModel):
-    id: int | None = None
     name: str
-    description: str | None = None
-    category_id: int
+    category: str
+    flavor: str | None
+    ingredients: str
+    # description: str | None = None
+
+    class Config:
+        from_attributes = True
+
+
+class ProductSchema(BaseModel):
+    name: str
+    category: str
+    flavor: str | None
+    ingredients: str
+    description: Optional[str]
 
     class Config:
         from_attributes = True
