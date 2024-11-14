@@ -2,10 +2,9 @@ from fastapi import Depends
 
 from sqlalchemy.orm import Session
 
-from app.infrastructure.database import get_db_session
-from app.products.repository import ProductRepository
-from app.products.service import ProductService
-from app.settings import Settings
+from infrastructure.database import get_db_session
+from repositories.product_repository import ProductRepository
+from services.product_service import ProductService
 
 
 def get_product_repository(db_session: Session = Depends(get_db_session)) -> ProductRepository:
