@@ -15,7 +15,13 @@ class UserRepository:
         stmt = select(UserProfile).filter(UserProfile.id == user_id)
         with self.db_session as session:
             user = session.execute(stmt).scalar()
-        return user
+            return user
+
+    def read_user_by_username(self, username: str) -> UserProfile | None:
+        stmt = select(UserProfile).where(UserProfile.username == username)
+        with self.db_session as session:
+            user = session.execute(stmt).scalar_one_or_none()
+            return user
 
     def create_user(self, username: str, password: str, access_token: str) -> UserProfile:
         stmt = insert(UserProfile).values(

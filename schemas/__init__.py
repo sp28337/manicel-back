@@ -3,12 +3,12 @@ from schemas.products_schema import (
     IngredientSchema, CategorySchema, FlavorSchema
 )
 from schemas.user_schema import (
-    UserLoginSchema, UserCreateSchema
+    UserLoginSchema, UserCreateSchema, UserSchema
 )
 
 
 __all__ = [
     "ProductsSchema", "ProductSchema", "CreateProductSchema", "UpdtaeProductSchema",
     "IngredientSchema", "CategorySchema", "FlavorSchema",
-    "UserLoginSchema", "UserCreateSchema"
+    "UserLoginSchema", "UserCreateSchema", "UserSchema"
 ]
