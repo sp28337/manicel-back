@@ -1,9 +1,7 @@
 from dataclasses import dataclass
-from linecache import cache
 from typing import List
 
-from repositories.product_cache_repository import ProductCache
-from repositories.product_repository import ProductRepository
+from repositories import ProductCache, ProductRepository
 from schemas import ProductsSchema, ProductSchema, CreateProductSchema, UpdtaeProductSchema
 
 

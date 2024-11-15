@@ -1,13 +1,13 @@
 from sqlalchemy import update
 from sqlalchemy.orm import Session
 
-from models import *
-from schemas import ProductSchema, CreateProductSchema
+from models.product_models import *
+from schemas.products_schema import ProductSchema, CreateProductSchema
 
 
 class ProductRepository:
-    def __init__(self, db_sesion: Session):
-        self.db_session = db_sesion
+    def __init__(self, db_session: Session):
+        self.db_session = db_session
 
     def read_products(self) -> list[Product] | None:
         with self.db_session as session:
