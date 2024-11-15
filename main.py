@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 
-from handlers.product_handler import router as items_router
+from handlers import routers
+
 
 app = FastAPI(title="MANICEL")
 
 
-app.include_router(items_router)
-
+for router in routers:
+    app.include_router(router)
