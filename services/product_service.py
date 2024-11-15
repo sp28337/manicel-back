@@ -1,6 +1,8 @@
 from dataclasses import dataclass
+from linecache import cache
 from typing import List
 
+from repositories.product_cache_repository import ProductCache
 from repositories.product_repository import ProductRepository
 from schemas import ProductsSchema, ProductSchema, CreateProductSchema, UpdtaeProductSchema
 
@@ -9,35 +11,43 @@ from schemas import ProductsSchema, ProductSchema, CreateProductSchema, UpdtaePr
 class ProductService:
 
     product_repository: ProductRepository
-    # product_cache: None
+    product_cache: ProductCache
 
     def read_products(self) -> List[ProductsSchema]:
-        # if cache_product := self.product_cache.read_products():
-        #     return cache_products
-        # else:
-        products = self.product_repository.read_products()
-        products_schema = [ProductsSchema.model_validate(product) for product in products]
-        # products_schema = [ProductsSchema(
+        if cache_products := self.product_cache.get_products():
+            print('*' * 100)
+            return cache_products
+        else:
+            print('-' * 100)
+            products = self.product_repository.read_products()
+            products_schema = [ProductsSchema.model_validate(product) for product in products]
+            # products_schema = [ProductsSchema(
         #     id=product.id,
         #     name=product.name,
         #     category=product.category,
         #     flavor=product.flavor,
         #     description=product.description,
         # ) for product in products]
-
-        # self.product_cache.write_items(product_schema)
-        return products_schema
+            self.product_cache.set_products(products_schema)
+            return products_schema
 
     def read_product(self, prodict_id: int) -> ProductSchema:
-        product = self.product_repository.read_product(prodict_id)
-        # product_schema = ProductSchema(
-        #     id=product.id,
-        #     name=product.name,
-        #     description=product.description,
-        #     flavor=product.flavor,
-        #     category=product.category,
-        # )
-        return ProductsSchema.model_validate(product)
+        if cache_product := self.product_cache.get_product(prodict_id):
+            print('*' * 100)
+            return cache_product
+        else:
+            print('-' * 100)
+            product = self.product_repository.read_product(prodict_id)
+            product_schema = ProductSchema.model_validate(product)
+            # product_schema = ProductSchema(
+            #     id=product.id,
+            #     name=product.name,
+            #     description=product.description,
+            #     flavor=product.flavor,
+            #     category=product.category,
+            # )
+            self.product_cache.set_product(product_schema)
+            return product_schema
 
     def create_product(self, body: CreateProductSchema) -> ProductSchema:
         product_id = self.product_repository.create_product(body)
