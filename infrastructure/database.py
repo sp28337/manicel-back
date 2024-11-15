@@ -9,7 +9,7 @@ engine = create_engine(
     echo=True,
     url=settings.get_db_url,
 )
-Session = sessionmaker(bind=engine)
+LocalSession = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 
 class Base(DeclarativeBase):
@@ -17,5 +17,5 @@ class Base(DeclarativeBase):
 
 
 def get_db_session():
-    with Session() as session:
+    with LocalSession() as session:
         return session
