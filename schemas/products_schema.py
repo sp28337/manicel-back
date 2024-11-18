@@ -1,63 +1,36 @@
-from typing import Optional, List
 from pydantic import BaseModel
 
 
-class IngredientSchema(BaseModel):
+class DefaultSchema(BaseModel):
     name: str
-    description: Optional[str]
-
-    class Config:
-        from_attributes = True
-
-
-class CategorySchema(BaseModel):
-    name: str
-    description: Optional[str]
-
-    class Config:
-        from_attributes = True
-
-
-class FlavorSchema(BaseModel):
-    name: str
-    description: Optional[str]
-    ingredients: List[IngredientSchema]
-
-    class Config:
-        from_attributes = True
-
-
-class ProductsSchema(BaseModel):
-    id: int
-    name: str
-    category: CategorySchema
-    flavor: FlavorSchema | None
     description: str | None = None
 
     class Config:
         from_attributes = True
 
 
-class ProductSchema(ProductsSchema):
-    description: Optional[str]
-
-    class Config:
-        from_attributes = True
+class IngredientSchema(DefaultSchema):
+    pass
 
 
-class CreateProductSchema(BaseModel):
-    name: str
-    description: str | None
+class CategorySchema(DefaultSchema):
+    pass
+
+
+class FlavorSchema(DefaultSchema):
+    ingredients: list[IngredientSchema]
+
+
+class ProductSchema(DefaultSchema):
+    id: int
+    category: CategorySchema
+    flavor: FlavorSchema | None
+
+
+class CreateProductSchema(DefaultSchema):
     category_id: int
     flavor_id: int
 
-    class Config:
-        from_attributes = True
 
-
-class UpdtaeProductSchema(BaseModel):
+class UpdtaeProductSchema(DefaultSchema):
     id: int
-    name: str
-
-    class Config:
-        from_attributes = True
