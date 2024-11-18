@@ -12,8 +12,6 @@ engine = create_engine(
 LocalSession = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 
-class Base(DeclarativeBase):
-    pass
 
 
 def get_db_session():
