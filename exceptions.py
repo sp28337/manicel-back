@@ -8,3 +8,23 @@ class UserIncorrectPasswordException(Exception):
 
 class UserAlreadyExistsException(Exception):
     detail = "User with this name already exists"
+
+
+class TokenExpiredException(Exception):
+    detail = "Token expired"
+
+
+class IncorrectTokenException(Exception):
+    detail = "Incorrect Token"
+
+
+class ProductNotFoundException(Exception):
+    detail = "Product not found"
+
+
+class ProductAlreadyExistsException(Exception):
+    detail = "Product already exists"
+
+
+class PermissionDeniedException(Exception):
+    detail = "Permission denied"
