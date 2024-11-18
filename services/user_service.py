@@ -1,34 +1,28 @@
-import string
 from dataclasses import dataclass
-from random import choice
 
 from exceptions import UserAlreadyExistsException
 from schemas import UserLoginSchema
 from repositories import UserRepository
+from services.auth_service import AuthService
 
 
 @dataclass
 class UserService:
     user_repository: UserRepository
+    auth_service: AuthService
 
     def create_user(self, username: str, password: str) -> UserLoginSchema:
 
-        check_user_exists = self.user_repository.read_user_by_username(username=username)
-        if check_user_exists:
+        if self.user_repository.read_user_by_username(username=username):
             raise UserAlreadyExistsException
 
-        generated_access_token = self._generate_access_token(10)
-        user = self.user_repository.create_user(
+        new_user = self.user_repository.create_user(
             username=username,
             password=password,
+        )
+        generated_access_token = self.auth_service.generate_access_token(user_id=new_user.id, is_admin=new_user.admin)
+        return UserLoginSchema(
+            id=new_user.id,
             access_token=generated_access_token
         )
 
-        return UserLoginSchema(
-            id=user.id,
-            access_token=user.access_token
-        )
-
-    @staticmethod
-    def _generate_access_token(n) -> str:
-        return "".join(choice(string.ascii_uppercase + string.digits) for _ in range(n))
