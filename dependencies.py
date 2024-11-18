@@ -56,11 +56,43 @@ def get_user_service(
     )
 
 
-    return UserService(user_repository=user_repository)
+reusable_oauth2 = security.HTTPBearer()
 
 
-def get_auth_service(
-    user_repository: UserRepository = Depends(get_user_repository)
-) -> AuthService:
+def get_request_user_id(
+    auth_service: Annotated[AuthService, Depends(get_auth_service)],
+    token: Annotated[security.http.HTTPAuthorizationCredentials, Security(reusable_oauth2)]
+) -> int:
+    print(token.credentials)
+    try:
+        user_id = auth_service.get_user_id_from_access_token(token.credentials)
+        return user_id
+    except TokenExpiredException as e:
+        raise HTTPException(
+            status_code=401,
+            detail=e.detail
+        )
+    except IncorrectTokenException as e:
+        raise HTTPException(
+            status_code=401,
+            detail=e.detail
+        )
 
-    return AuthService(user_repository=user_repository)
+
+def get_request_admin(
+    auth_service: Annotated[AuthService, Depends(get_auth_service)],
+    token: Annotated[security.http.HTTPAuthorizationCredentials, Security(reusable_oauth2)]
+) -> bool:
+    try:
+        is_admin = auth_service.check_is_user_admin_from_access_token(token.credentials)
+        return is_admin
+    except PermissionDeniedException as e:
+        raise HTTPException(
+            status_code=403,
+            detail=e.detail
+        )
+    except IncorrectTokenException as e:
+        raise HTTPException(
+            status_code=401,
+            detail=e.detail
+        )
