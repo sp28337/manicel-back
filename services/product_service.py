@@ -1,8 +1,7 @@
 from dataclasses import dataclass
-from typing import List
 
 from repositories import ProductCache, ProductRepository
-from schemas import ProductsSchema, ProductSchema, CreateProductSchema, UpdtaeProductSchema
+from schemas import ProductSchema, CreateProductSchema, UpdtaeProductSchema
 
 
 @dataclass
@@ -11,14 +10,14 @@ class ProductService:
     product_repository: ProductRepository
     product_cache: ProductCache
 
-    def read_products(self) -> List[ProductsSchema]:
+    def read_products(self) -> list[ProductSchema]:
         if cache_products := self.product_cache.get_products():
             print('*' * 100)
             return cache_products
         else:
             print('-' * 100)
             products = self.product_repository.read_products()
-            products_schema = [ProductsSchema.model_validate(product) for product in products]
+            products_schema = [ProductSchema.model_validate(product) for product in products]
             # products_schema = [ProductsSchema(
         #     id=product.id,
         #     name=product.name,
@@ -29,28 +28,33 @@ class ProductService:
             self.product_cache.set_products(products_schema)
             return products_schema
 
-    def read_product(self, prodict_id: int) -> ProductSchema:
-        if cache_product := self.product_cache.get_product(prodict_id):
+    def read_product(self, product_id: int) -> ProductSchema:
+        if cache_product := self.product_cache.get_product(product_id):
             print('*' * 100)
             return cache_product
-        else:
-            print('-' * 100)
-            product = self.product_repository.read_product(prodict_id)
-            product_schema = ProductSchema.model_validate(product)
-            # product_schema = ProductSchema(
-            #     id=product.id,
-            #     name=product.name,
-            #     description=product.description,
-            #     flavor=product.flavor,
-            #     category=product.category,
-            # )
-            self.product_cache.set_product(product_schema)
-            return product_schema
+
+        print('-' * 100)
+
+        check_product = self.product_repository.read_product_by_id(product_id)
+        if check_product is None:
+            raise ProductNotFoundException
+
+        product = self.product_repository.read_product_by_id(product_id)
+        product_schema = ProductSchema.model_validate(product)
+        # product_schema = ProductSchema(
+        #     id=product.id,
+        #     name=product.name,
+        #     description=product.description,
+        #     flavor=product.flavor,
+        #     category=product.category,
+        # )
+        self.product_cache.set_product(product_schema)
+        return product_schema
 
     def create_product(self, body: CreateProductSchema) -> ProductSchema:
         product_id = self.product_repository.create_product(body)
-        new_product = self.product_repository.read_product(product_id)
-        return new_product
+        new_product = self.product_repository.read_product_by_id(product_id)
+        return ProductSchema.model_validate(new_product)
 
     def update_product_name(self, product_id: int, product_name: str) -> UpdtaeProductSchema:
         updated_product = self.product_repository.update_product_name(product_id, product_name)

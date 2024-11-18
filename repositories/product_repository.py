@@ -1,16 +1,17 @@
+from dataclasses import dataclass
+
 from sqlalchemy import update
-from sqlalchemy.orm import Session
 
-from models.product_models import *
-from schemas.products_schema import ProductSchema, CreateProductSchema
+from infrastructure.database import LocalSession
+from models.product_models import Product
 
 
+@dataclass
 class ProductRepository:
-    def __init__(self, db_session: Session):
-        self.db_session = db_session
+    db_session: LocalSession
 
     def read_products(self) -> list[Product] | None:
-        with self.db_session as session:
+        with self.db_session() as session:
             # subquery = (
             #     session.query(
             #         Flavor.name.label("flavor"),
@@ -36,10 +37,16 @@ class ProductRepository:
             # products: list[Product] = query.all()
             products = session.query(Product).all()
             print(products)
-        return products
+            return products
 
-    def read_product(self, product_id: int) -> ProductSchema | None:
-        with self.db_session as session:
+    def read_product_by_name(self, product_name: str) -> Product | None:
+        with self.db_session() as session:
+            product = session.query(Product).filter(Product.name == product_name).first()
+            print(product)
+            return product
+
+    def read_product_by_id(self, product_id: int) -> Product | None:
+        with self.db_session() as session:
             # sub_query = (
             #     session.query(
             #         Flavor.name.label("flavor"),
@@ -62,13 +69,18 @@ class ProductRepository:
             #                   ).join(sub_query, sub_query.c.flavor == Flavor.name
             #                          ).where(Flavor.name == flavor_name)
             # )  # query - основной запрос для получения продукта
-
-            product = session.query(Product).filter(Product.id == product_id).first()
+            #
+            #                       or
+            #
+            # product = session.query(Product).filter(Product.id == product_id).first()
+            #
+            #                       or
+            product = session.get(Product, product_id)
             print(product)
-        return product
+            return product
 
-    def create_product(self, body: CreateProductSchema) -> int:
-        with self.db_session as session:
+    def create_product(self, body: Product) -> int:
+        with self.db_session() as session:
             new_product = Product(
                 name=body.name,
                 description=body.description,
@@ -79,17 +91,17 @@ class ProductRepository:
             session.flush()
             product_id = new_product.id
             session.commit()
-        return product_id
+            return product_id
 
     def update_product_name(self, product_id: int, product_name: str) -> Product:
-        with self.db_session as session:
+        with self.db_session() as session:
             stmt = update(Product).where(Product.id == product_id).values(name=product_name).returning(Product.id)
             product_id = session.execute(stmt).scalar_one_or_none()
             session.commit()
             session.flush()
-            return self.read_product(product_id)
+            return self.read_product_by_id(product_id)
 
     def delete_product(self, product_id: int) -> None:
-        with self.db_session as session:
+        with self.db_session() as session:
             session.query(Product).filter(Product.id == product_id).delete()
             session.commit()
