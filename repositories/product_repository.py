@@ -35,7 +35,7 @@ class ProductRepository:
             # )  # query - основной запрос для получения продуктов
             #
             # products: list[Product] = query.all()
-            products = session.query(Product).all()
+            products = session.query(Product).order_by(Product.id).all()
             print(products)
             return products
 
