@@ -6,8 +6,12 @@ class UserIncorrectPasswordException(Exception):
     detail = "Incorrect password"
 
 
-class UserAlreadyExistsException(Exception):
+class UserNameAlreadyExistsException(Exception):
     detail = "User with this name already exists"
+
+
+class UserEmailAlreadyExistsException(Exception):
+    detail = "User with this email already exists"
 
 
 class TokenExpiredException(Exception):
