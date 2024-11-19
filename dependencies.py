@@ -4,6 +4,7 @@ from fastapi import Depends, security, Security, HTTPException
 
 from sqlalchemy.orm import Session
 
+from clients import GoogleClient
 from exceptions import TokenExpiredException, IncorrectTokenException, PermissionDeniedException
 from infrastructure.cache import get_redis_connection
 from infrastructure.database import get_db_session
@@ -40,10 +41,19 @@ def get_user_repository(
     return UserRepository(db_session=db_session)
 
 
+def get_google_client() -> GoogleClient:
+    return GoogleClient(settings=Settings())
+
+
 def get_auth_service(
-        user_repository: Annotated[UserRepository, Depends(get_user_repository)]
+        user_repository: Annotated[UserRepository, Depends(get_user_repository)],
+        google_client: Annotated[GoogleClient, Depends(get_google_client)]
 ) -> AuthService:
-    return AuthService(user_repository=user_repository, settings=Settings())
+    return AuthService(
+        user_repository=user_repository,
+        settings=Settings(),
+        google_client=google_client
+    )
 
 
 def get_user_service(
@@ -56,6 +66,7 @@ def get_user_service(
     )
 
 
+# Authorization -------------------------------------------------------------------------------------------------------
 reusable_oauth2 = security.HTTPBearer()
 
 
@@ -96,3 +107,5 @@ def get_request_admin(
             status_code=401,
             detail=e.detail
         )
+
+# ---------------------------------------------------------------------------------------------------------------------

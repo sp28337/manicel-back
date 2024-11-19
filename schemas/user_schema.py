@@ -1,15 +1,23 @@
 from pydantic import BaseModel
 
 
-class UserCreateSchema(BaseModel):
+class UserSchema(BaseModel):
     username: str
     password: str
 
 
+class UserCreateSchema(UserSchema):
+    email: str
+
+
 class UserLoginSchema(BaseModel):
-    id: int
+    user_id: int
     access_token: str
 
 
-class UserSchema(UserCreateSchema):
-    pass
+class UserGoogleCreateSchema(BaseModel):
+    username: str | None = None
+    password: str | None = None
+    email: str
+    name: str | None = None
+    google_access_token: str

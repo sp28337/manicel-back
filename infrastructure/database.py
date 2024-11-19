@@ -7,7 +7,7 @@ from settings import Settings
 settings = Settings()
 
 engine = create_engine(
-    echo=True,
+    # echo=True,
     url=settings.get_db_url,
 )
 
