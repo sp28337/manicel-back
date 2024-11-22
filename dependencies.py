@@ -39,11 +39,13 @@ def get_yandex_client() -> YandexClient:
 # Get services --------------------------------------------------------------------------------------------------------
 def get_product_service(
         product_repository: Annotated[ProductRepository, Depends(get_product_repository)],
-        product_cache: Annotated[ProductCache, Depends(get_product_cache_repository)]
+        product_cache: Annotated[ProductCache, Depends(get_product_cache_repository)],
+        user_repository: Annotated[UserRepository, Depends(get_user_repository)],
 ) -> ProductService:
     return ProductService(
         product_repository=product_repository,
-        product_cache=product_cache
+        product_cache=product_cache,
+        user_repository=user_repository
     )
 
 
@@ -94,24 +96,4 @@ def get_request_user_id(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=e.detail
         )
-
-
-def get_request_admin(
-    auth_service: Annotated[AuthService, Depends(get_auth_service)],
-    token: Annotated[security.http.HTTPAuthorizationCredentials, Security(reusable_oauth2)]
-) -> bool:
-    try:
-        is_admin = auth_service.check_is_user_admin_from_access_token(token.credentials)
-        return is_admin
-    except PermissionDeniedException as e:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=e.detail
-        )
-    except IncorrectTokenException as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=e.detail
-        )
-
 # ---------------------------------------------------------------------------------------------------------------------

@@ -1,3 +1,6 @@
+import datetime
+
+from sqlalchemy import text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from models.base import Base
@@ -14,3 +17,6 @@ class UserProfile(Base):
     admin: Mapped[bool] = mapped_column(default=False)
     google_access_token: Mapped[str | None]
     yandex_access_token: Mapped[str | None]
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        server_default=text("TIMEZONE('utc', NOW())")
+        )

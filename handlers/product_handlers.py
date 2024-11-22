@@ -1,8 +1,8 @@
 from typing import Annotated, List
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from dependencies import get_product_service, get_request_user_id, get_request_admin
-from exceptions import ProductAlreadyExistsException, ProductNotFoundException
+from dependencies import get_product_service, get_request_user_id
+from exceptions import ProductAlreadyExistsException, ProductNotFoundException, PermissionDeniedException
 from schemas import ProductSchema, CreateProductSchema, UpdtaeProductSchema
 from services import ProductService
 
@@ -35,14 +35,21 @@ async def read_product(
 async def create_product(
     body: CreateProductSchema,
     product_service: Annotated[ProductService, Depends(get_product_service)],
-    is_admin: Annotated[bool, Depends(get_request_admin)]
-    # user_id: Annotated[int, Depends(get_request_user_id)]
+    user_id: Annotated[int, Depends(get_request_user_id)]
 ):
     try:
-        return product_service.create_product(body)
+        return product_service.create_product(
+            body=body,
+            user_id=user_id
+        )
     except ProductAlreadyExistsException as e:
         raise HTTPException(
             status_code=403,
+            detail=e.detail
+        )
+    except PermissionDeniedException as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
             detail=e.detail
         )
 
@@ -52,14 +59,23 @@ async def update_product_name(
     product_id: int,
     product_name: str,
     product_service: Annotated[ProductService, Depends(get_product_service)],
-    # user_id: Annotated[int, Depends(get_request_user_id)],
-    is_admin: Annotated[bool, Depends(get_request_admin)]
+    user_id: Annotated[int, Depends(get_request_user_id)],
 ):
     try:
-        return product_service.update_product_name(product_id, product_name)
+        return product_service.update_product_name(
+            product_id=product_id,
+            product_name=product_name,
+            user_id=user_id
+        )
+
     except ProductNotFoundException as e:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=e.detail
+        )
+    except PermissionDeniedException as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
             detail=e.detail
         )
 
@@ -68,13 +84,21 @@ async def update_product_name(
 async def delete_product(
     product_id: int,
     product_service: Annotated[ProductService, Depends(get_product_service)],
-    is_admin: Annotated[bool, Depends(get_request_admin)]
-    # user_id: Annotated[int, Depends(get_request_user_id)]
+    user_id: Annotated[int, Depends(get_request_user_id)]
 ):
     try:
-        return product_service.delete_product(product_id)
+        return product_service.delete_product(
+            product_id=product_id,
+            user_id=user_id
+        )
+
     except ProductNotFoundException as e:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=e.detail
+        )
+    except PermissionDeniedException as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
             detail=e.detail
         )

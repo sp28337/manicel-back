@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from exceptions import ProductNotFoundException, ProductAlreadyExistsException
-from repositories import ProductCache, ProductRepository
+from exceptions import ProductNotFoundException, ProductAlreadyExistsException, PermissionDeniedException
+from repositories import ProductCache, ProductRepository, UserRepository
 from schemas import ProductSchema, CreateProductSchema, UpdtaeProductSchema
 
 
@@ -10,6 +10,7 @@ class ProductService:
 
     product_repository: ProductRepository
     product_cache: ProductCache
+    user_repository: UserRepository
 
     def read_products(self) -> list[ProductSchema]:
         if cache_products := self.product_cache.get_products():
@@ -52,7 +53,9 @@ class ProductService:
         self.product_cache.set_product(product_schema)
         return product_schema
 
-    def create_product(self, body: CreateProductSchema) -> ProductSchema:
+    def create_product(self, body: CreateProductSchema, user_id: int) -> ProductSchema:
+        self._validate_admin(user_id)
+
         check_product = self.product_repository.read_product_by_name(body.name)
         if check_product:
             raise ProductAlreadyExistsException
@@ -61,18 +64,26 @@ class ProductService:
         new_product = self.product_repository.read_product_by_id(product_id)
         return ProductSchema.model_validate(new_product)
 
-    def update_product_name(self, product_id: int, product_name: str) -> UpdtaeProductSchema:
-        check_product = self.product_repository.read_product_by_id(product_id)
+    def update_product_name(self, product_id: int, product_name: str, user_id: int) -> UpdtaeProductSchema:
+        self._validate_admin(user_id)
 
+        check_product = self.product_repository.read_product_by_id(product_id)
         if check_product is None:
             raise ProductNotFoundException
 
         updated_product = self.product_repository.update_product_name(product_id, product_name)
         return UpdtaeProductSchema.model_validate(updated_product)
 
-    def delete_product(self, product_id: int) -> None:
+    def delete_product(self, product_id: int, user_id: int) -> None:
+        self._validate_admin(user_id)
         check_product = self.product_repository.read_product_by_id(product_id)
 
         if check_product is None:
             raise ProductNotFoundException
         self.product_repository.delete_product(product_id)
+
+    def _validate_admin(self, user_id: int) -> bool:
+        user = self.user_repository.read_user_by_id(user_id)
+        print(f"\nuser_is_admin: {user.admin}\n")
+        if user.admin is False:
+            raise PermissionDeniedException

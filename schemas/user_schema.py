@@ -1,3 +1,5 @@
+import datetime
+
 from pydantic import BaseModel, model_validator
 
 
@@ -19,6 +21,7 @@ class UserProfileSchema(BaseModel):
     admin: bool
     google_access_token: str | None
     yandex_access_token: str | None
+    created_at: datetime.datetime | None
 
     class Config:
         from_attributes = True
@@ -30,6 +33,7 @@ class UserLoginSchema(BaseModel):
 
 
 class UserOAuthCreateSchema(BaseModel):
+    username: str | None = None
     email: str | None = None
     name: str | None = None
     google_access_token: str | None = None

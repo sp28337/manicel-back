@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, update
 
 from infrastructure.database import LocalSession
 from models.user_models import UserProfile
@@ -44,6 +44,39 @@ class UserRepository:
 
         with self.db_session() as session:
             user_id = session.execute(stmt).scalar()
+            session.commit()
+            session.flush()
+            return self.read_user_by_id(user_id)
+
+    def update_username(self, user_id: int, new_username: str) -> UserProfile:
+        stmt = update(UserProfile
+                      ).where(UserProfile.id == user_id
+                              ).values(username=new_username
+                                       ).returning(UserProfile.id)
+        with self.db_session() as session:
+            session.execute(stmt)
+            session.commit()
+            session.flush()
+            return self.read_user_by_id(user_id)
+
+    def update_name(self, user_id: int, new_name: str) -> UserProfile:
+        stmt = update(UserProfile
+                      ).where(UserProfile.id == user_id
+                              ).values(name=new_name
+                                       ).returning(UserProfile.id)
+        with self.db_session() as session:
+            session.execute(stmt)
+            session.commit()
+            session.flush()
+            return self.read_user_by_id(user_id)
+
+    def update_password(self, user_id: int, new_password: str) -> UserProfile:
+        stmt = update(UserProfile
+                      ).where(UserProfile.id == user_id
+                              ).values(password=new_password
+                                       ).returning(UserProfile.id)
+        with self.db_session() as session:
+            session.execute(stmt)
             session.commit()
             session.flush()
             return self.read_user_by_id(user_id)
