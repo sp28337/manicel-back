@@ -4,7 +4,7 @@ from sqlalchemy import insert, select
 
 from infrastructure.database import LocalSession
 from models.user_models import UserProfile
-from schemas import UserCreateSchema, UserGoogleCreateSchema
+from schemas import UserCreateSchema, UserOAuthCreateSchema
 
 
 @dataclass
@@ -32,13 +32,13 @@ class UserRepository:
         with self.db_session() as session:
             return session.execute(stmt).scalar_one_or_none()
 
-    def read_user_by_access_token(self, access_token: str) -> UserProfile | None:
-        stmt = select(UserProfile).where(UserProfile.google_access_token == access_token)
+    def read_user_by_yandex_access_token(self, access_token: str) -> UserProfile | None:
+        stmt = select(UserProfile).where(UserProfile.yandex_access_token == access_token)
 
         with self.db_session() as session:
             return session.execute(stmt).scalar_one_or_none()
 
-    def create_user(self, user_data: UserCreateSchema | UserGoogleCreateSchema) -> UserProfile:
+    def create_user(self, user_data: UserCreateSchema | UserOAuthCreateSchema) -> UserProfile:
         stmt = insert(UserProfile).values(
             user_data.model_dump(exclude_none=True)
         ).returning(UserProfile.id)

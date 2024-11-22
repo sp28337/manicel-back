@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from dependencies import get_user_service
 from exceptions import UserNameAlreadyExistsException, UserEmailAlreadyExistsException
@@ -16,10 +16,14 @@ async def create_user(
     user_service: Annotated[UserService, Depends(get_user_service)]
 ):
     try:
-        return user_service.create_user(username=body.username, password=body.password, email=body.email)
+        return user_service.create_user(
+            username=body.username,
+            password=body.password,
+            email=body.email
+        )
 
     except (UserNameAlreadyExistsException, UserEmailAlreadyExistsException) as e:
         raise HTTPException(
-            status_code=403,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail=e.detail
         )

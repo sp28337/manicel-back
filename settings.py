@@ -21,6 +21,11 @@ class Settings(BaseSettings):
     GOOGLE_REDIRECT_URI: str = ""
     GOOGLE_TOKEN_URL: str = "https://accounts.google.com/o/oauth2/token"
 
+    YANDEX_CLIENT_ID: str = ""
+    YANDEX_SECRET_KEY: str = ""
+    YANDEX_REDIRECT_URI: str = ""
+    YANDEX_TOKEN_URI: str = "https://oauth.yandex.ru/token"
+
     @property
     def get_db_url(self):
         return f"{self.DB_DRIVER}://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
@@ -28,3 +33,7 @@ class Settings(BaseSettings):
     @property
     def google_redirect_url(self):
         return f"https://accounts.google.com/o/oauth2/auth?response_type=code&client_id={self.GOOGLE_CLIENT_ID}&redirect_uri={self.GOOGLE_REDIRECT_URI}&scope=openid%20profile%20email%20&access_type=offline"
+
+    @property
+    def yandex_redirect_url(self):
+        return f"https://oauth.yandex.ru/authorize?response_type=code&client_id={self.YANDEX_CLIENT_ID}&redirect_uri={self.YANDEX_REDIRECT_URI}"

@@ -13,3 +13,4 @@ class UserProfile(Base):
     email: Mapped[str]
     admin: Mapped[bool] = mapped_column(default=False)
     google_access_token: Mapped[str | None]
+    yandex_access_token: Mapped[str | None]

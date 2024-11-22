@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 
 class UserSchema(BaseModel):
@@ -15,9 +15,14 @@ class UserLoginSchema(BaseModel):
     access_token: str
 
 
-class UserGoogleCreateSchema(BaseModel):
-    username: str | None = None
-    password: str | None = None
-    email: str
+class UserOAuthCreateSchema(BaseModel):
+    email: str | None = None
     name: str | None = None
-    google_access_token: str
+    google_access_token: str | None = None
+    yandex_access_token: str | None = None
+
+    @model_validator(mode="after")
+    def check_google_or_yandex_access_token_is_not_none(self):
+        if self.google_access_token is None and self.yandex_access_token is None:
+            raise ValueError("google or yandex access token must be provided")
+        return self

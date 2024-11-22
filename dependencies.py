@@ -1,10 +1,10 @@
 from typing import Annotated
 
-from fastapi import Depends, security, Security, HTTPException
+from fastapi import Depends, security, Security, HTTPException, status
 
 from sqlalchemy.orm import Session
 
-from clients import GoogleClient
+from clients import GoogleClient, YandexClient
 from exceptions import TokenExpiredException, IncorrectTokenException, PermissionDeniedException
 from infrastructure.cache import get_redis_connection
 from infrastructure.database import get_db_session
@@ -13,18 +13,30 @@ from services import ProductService, UserService, AuthService
 from settings import Settings
 
 
-def get_product_repository(
-        db_session: Annotated[Session, Depends(get_db_session)]
-) -> ProductRepository:
+# Get repositories ----------------------------------------------------------------------------------------------------
+def get_product_repository(db_session: Annotated[Session, Depends(get_db_session)]) -> ProductRepository:
     return ProductRepository(db_session=db_session)
 
 
 def get_product_cache_repository() -> ProductCache:
     redis_connection = get_redis_connection()
-
     return ProductCache(redis_connection=redis_connection)
 
 
+def get_user_repository(db_session: Annotated[Session, Depends(get_db_session)]) -> UserRepository:
+    return UserRepository(db_session=db_session)
+
+
+# Get clients ---------------------------------------------------------------------------------------------------------
+def get_google_client() -> GoogleClient:
+    return GoogleClient(settings=Settings())
+
+
+def get_yandex_client() -> YandexClient:
+    return YandexClient(settings=Settings())
+
+
+# Get services --------------------------------------------------------------------------------------------------------
 def get_product_service(
         product_repository: Annotated[ProductRepository, Depends(get_product_repository)],
         product_cache: Annotated[ProductCache, Depends(get_product_cache_repository)]
@@ -35,24 +47,16 @@ def get_product_service(
     )
 
 
-def get_user_repository(
-        db_session: Annotated[Session, Depends(get_db_session)]
-) -> UserRepository:
-    return UserRepository(db_session=db_session)
-
-
-def get_google_client() -> GoogleClient:
-    return GoogleClient(settings=Settings())
-
-
 def get_auth_service(
         user_repository: Annotated[UserRepository, Depends(get_user_repository)],
-        google_client: Annotated[GoogleClient, Depends(get_google_client)]
+        google_client: Annotated[GoogleClient, Depends(get_google_client)],
+        yandex_client: Annotated[YandexClient, Depends(get_yandex_client)]
 ) -> AuthService:
     return AuthService(
         user_repository=user_repository,
         settings=Settings(),
-        google_client=google_client
+        google_client=google_client,
+        yandex_client=yandex_client
     )
 
 
@@ -80,12 +84,12 @@ def get_request_user_id(
         return user_id
     except TokenExpiredException as e:
         raise HTTPException(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail=e.detail
         )
     except IncorrectTokenException as e:
         raise HTTPException(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail=e.detail
         )
 
@@ -99,12 +103,12 @@ def get_request_admin(
         return is_admin
     except PermissionDeniedException as e:
         raise HTTPException(
-            status_code=403,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail=e.detail
         )
     except IncorrectTokenException as e:
         raise HTTPException(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail=e.detail
         )
 
