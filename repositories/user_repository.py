@@ -13,11 +13,10 @@ class UserRepository:
     db_session: LocalSession
 
     def read_user_by_id(self, user_id: int) -> UserProfile | None:
-        stmt = select(UserProfile).filter(UserProfile.id == user_id)
-        
+        # stmt = select(UserProfile).filter(UserProfile.id == user_id)
         with self.db_session() as session:
-            user = session.execute(stmt).scalar()
-            return user
+            # user = session.execute(stmt).scalar()
+            return session.get(UserProfile, user_id)
 
     def read_user_by_username(self, username: str) -> UserProfile | None:
         stmt = select(UserProfile).where(UserProfile.username == username)

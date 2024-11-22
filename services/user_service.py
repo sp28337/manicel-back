@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from exceptions import UserNameAlreadyExistsException, UserEmailAlreadyExistsException
-from schemas import UserLoginSchema, UserCreateSchema
+from schemas import UserLoginSchema, UserCreateSchema, UserProfileSchema
 from repositories import UserRepository
 from services.auth_service import AuthService
 
@@ -10,6 +10,9 @@ from services.auth_service import AuthService
 class UserService:
     user_repository: UserRepository
     auth_service: AuthService
+
+    def read_user_profile(self, user_id: int) -> UserProfileSchema:
+        return self.user_repository.read_user_by_id(user_id=user_id)
 
     def create_user(self, username: str, password: str, email: str) -> UserLoginSchema:
         user_create_schema = UserCreateSchema(

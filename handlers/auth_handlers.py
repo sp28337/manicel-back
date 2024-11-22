@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
 from dependencies import get_auth_service
 from exceptions import UserNotFoundException, UserIncorrectPasswordException
@@ -19,18 +19,15 @@ async def login(
     auth_service: Annotated[AuthService, Depends(get_auth_service)]
 ):
     try:
-
         return auth_service.login(body.password, body.username)
-
     except UserNotFoundException as e:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=e.detail
         )
-
     except UserIncorrectPasswordException as e:
         raise HTTPException(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail=e.detail
         )
 

@@ -10,6 +10,20 @@ class UserCreateSchema(UserSchema):
     email: str
 
 
+class UserProfileSchema(BaseModel):
+    id: int
+    username: str | None
+    password: str | None
+    name: str | None
+    email: str
+    admin: bool
+    google_access_token: str | None
+    yandex_access_token: str | None
+
+    class Config:
+        from_attributes = True
+
+
 class UserLoginSchema(BaseModel):
     user_id: int
     access_token: str

@@ -78,7 +78,9 @@ def get_request_user_id(
     auth_service: Annotated[AuthService, Depends(get_auth_service)],
     token: Annotated[security.http.HTTPAuthorizationCredentials, Security(reusable_oauth2)]
 ) -> int:
-    print(token.credentials)
+
+    print(f"\ntoken credentials: {token.credentials}\n")
+
     try:
         user_id = auth_service.get_user_id_from_access_token(token.credentials)
         return user_id
