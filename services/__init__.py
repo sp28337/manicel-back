@@ -6,5 +6,5 @@ from services.auth_service import AuthService
 __all__ = [
     "ProductService",
     "UserService",
-    "AuthService"
+    "AuthService",
 ]

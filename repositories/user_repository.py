@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from sqlalchemy import insert, select, update
+from sqlalchemy import insert, select, update, delete
 
 from infrastructure.database import LocalSession
 from models.user_models import UserProfile
@@ -80,3 +80,10 @@ class UserRepository:
             session.commit()
             session.flush()
             return self.read_user_by_id(user_id)
+
+    def delete_user(self, user_id: int) -> None:
+        stmt = delete(UserProfile).where(UserProfile.id == user_id)
+        with self.db_session() as session:
+            session.execute(stmt)
+            session.commit()
+            session.flush()

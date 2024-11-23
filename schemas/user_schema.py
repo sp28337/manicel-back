@@ -44,3 +44,15 @@ class UserOAuthCreateSchema(BaseModel):
         if self.google_access_token is None and self.yandex_access_token is None:
             raise ValueError("google or yandex access token must be provided")
         return self
+
+
+class UserUpdatePasswordSchema(BaseModel):
+    old_password: str | None
+    new_password: str
+    repeat_new_password: str
+
+    @model_validator(mode="after")
+    def check_new_password_equal_repeat_new_password(self):
+        if self.new_password != self.repeat_new_password:
+            raise ValueError("Passwords do not match")
+        return self
