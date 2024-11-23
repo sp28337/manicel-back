@@ -8,7 +8,6 @@ from clients import GoogleClient, YandexClient
 from exceptions import (
     TokenExpiredException,
     IncorrectTokenException,
-    PermissionDeniedException,
 )
 from infrastructure.cache import get_redis_connection
 from infrastructure.database import get_db_session

@@ -21,7 +21,7 @@ class AuthService:
 
     def google_auth(self, code: str) -> UserLoginSchema:
         user_data = self.google_client.get_user_info(code=code)
-        print(f"\n\nUSER DATA: {user_data}\n\n")
+        print(f"\nUSER DATA: {user_data}\n")
 
         if user := self.user_repository.read_user_by_email(email=user_data.email):
 
@@ -45,7 +45,9 @@ class AuthService:
         user_data = self.yandex_client.get_user_info(code=code)
         print(f"\n5) USER DATA FROM YANDEX: {user_data}\n")
 
-        if user := self.user_repository.read_user_by_username(username=f"{user_data.login}_{user_data.id}"):
+        if user := self.user_repository.read_user_by_username(
+            username=f"{user_data.login}_{user_data.id}"
+        ):
 
             access_token = self.generate_access_token(user_id=user.id)
             print(f"\nUser: {user_data.name} LOGIN\n")
@@ -70,7 +72,9 @@ class AuthService:
         return self.settings.yandex_redirect_url
 
     def login(self, username: str, password: str) -> UserLoginSchema:
-        user: UserProfile = self.user_repository.read_user_by_username(username=username)
+        user: UserProfile = self.user_repository.read_user_by_username(
+            username=username
+        )
 
         self._validate_auth_user(user, password)
 
@@ -88,12 +92,9 @@ class AuthService:
         expires_date_unix = (dt.datetime.now(dt.UTC) + dt.timedelta(days=7)).timestamp()
 
         access_token: str = jwt.encode(
-            claims={
-                "user_id": user_id,
-                "expire": expires_date_unix
-            },
+            claims={"user_id": user_id, "expire": expires_date_unix},
             key=self.settings.JWT_SECRET_KEY,
-            algorithm=self.settings.JWT_ENCODE_ALHORITHM
+            algorithm=self.settings.JWT_ENCODE_ALHORITHM,
         )
 
         return access_token
@@ -103,7 +104,7 @@ class AuthService:
             payload: dict = jwt.decode(
                 access_token,
                 self.settings.JWT_SECRET_KEY,
-                algorithms=[self.settings.JWT_ENCODE_ALHORITHM]
+                algorithms=[self.settings.JWT_ENCODE_ALHORITHM],
             )
         except JWTError:
             raise IncorrectTokenException
@@ -112,15 +113,3 @@ class AuthService:
             raise TokenExpiredException
 
         return payload["user_id"]
-
-    # def check_is_user_admin_from_access_token(self, access_token: str) -> bool:
-    #     try:
-    #         payload: dict = jwt.decode(
-    #             access_token,
-    #             self.settings.JWT_SECRET_KEY,
-    #             algorithms=[self.settings.JWT_ENCODE_ALHORITHM]
-    #         )
-    #     except JWTError:
-    #         raise IncorrectTokenException
-    #
-    #     return payload["admin"]
