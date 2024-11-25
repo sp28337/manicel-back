@@ -1,17 +1,17 @@
 from dataclasses import dataclass
 
-from sqlalchemy import update
+from sqlalchemy import update, select
 
-from infrastructure.database import LocalSession
+from infrastructure.database import LocalAsyncSession
 from models.product_models import Product
 
 
 @dataclass
 class ProductRepository:
-    db_session: LocalSession
+    db_session: LocalAsyncSession
 
-    def read_products(self) -> list[Product] | None:
-        with self.db_session() as session:
+    async def read_products(self) -> list[Product] | None:
+        async with self.db_session() as session:
             # subquery = (
             #     session.query(
             #         Flavor.name.label("flavor"),
@@ -35,18 +35,22 @@ class ProductRepository:
             # )  # query - основной запрос для получения продуктов
             #
             # products: list[Product] = query.all()
-            products = session.query(Product).order_by(Product.id).all()
+            products = (await session.execute(select(Product).order_by(Product.id))).unique().scalars().all()
             print(products)
             return products
 
-    def read_product_by_name(self, product_name: str) -> Product | None:
-        with self.db_session() as session:
-            product = session.query(Product).filter(Product.name == product_name).first()
+    async def read_product_by_name(self, product_name: str) -> Product | None:
+        async with self.db_session() as session:
+            product = (
+                await session.query(Product)
+                .filter(Product.name == product_name)
+                .first()
+            )
             print(product)
             return product
 
-    def read_product_by_id(self, product_id: int) -> Product | None:
-        with self.db_session() as session:
+    async def read_product_by_id(self, product_id: int) -> Product | None:
+        async with self.db_session() as session:
             # sub_query = (
             #     session.query(
             #         Flavor.name.label("flavor"),
@@ -75,33 +79,38 @@ class ProductRepository:
             # product = session.query(Product).filter(Product.id == product_id).first()
             #
             #                       or
-            product = session.get(Product, product_id)
+            product = await session.get(Product, product_id)
             print(product)
             return product
 
-    def create_product(self, body: Product) -> int:
-        with self.db_session() as session:
+    async def create_product(self, body: Product) -> int:
+        async with self.db_session() as session:
             new_product = Product(
                 name=body.name,
                 description=body.description,
                 category_id=body.category_id,
-                flavor_id=body.flavor_id
+                flavor_id=body.flavor_id,
             )
-            session.add(new_product)
-            session.flush()
+            await session.add(new_product)
+            await session.flush()
             product_id = new_product.id
-            session.commit()
+            await session.commit()
             return product_id
 
-    def update_product_name(self, product_id: int, product_name: str) -> Product:
-        with self.db_session() as session:
-            stmt = update(Product).where(Product.id == product_id).values(name=product_name).returning(Product.id)
-            product_id = session.execute(stmt).scalar_one_or_none()
-            session.commit()
-            session.flush()
-            return self.read_product_by_id(product_id)
+    async def update_product_name(self, product_id: int, product_name: str) -> Product:
+        async with self.db_session() as session:
+            stmt = (
+                update(Product)
+                .where(Product.id == product_id)
+                .values(name=product_name)
+                .returning(Product.id)
+            )
+            product_id = (await session.execute(stmt)).scalar_one_or_none()
+            await session.commit()
+            await session.flush()
+            return await self.read_product_by_id(product_id)
 
-    def delete_product(self, product_id: int) -> None:
-        with self.db_session() as session:
-            session.query(Product).filter(Product.id == product_id).delete()
-            session.commit()
+    async def delete_product(self, product_id: int) -> None:
+        async with self.db_session() as session:
+            await session.query(Product).filter(Product.id == product_id).delete()
+            await session.commit()

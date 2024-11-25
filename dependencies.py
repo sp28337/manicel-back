@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import Depends, security, Security, HTTPException, status
 
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from clients import GoogleClient, YandexClient
 from exceptions import (
@@ -10,7 +10,7 @@ from exceptions import (
     IncorrectTokenException,
 )
 from infrastructure.cache import get_redis_connection
-from infrastructure.database import get_db_session
+from infrastructure.database import get_async_db_session
 from repositories import ProductCache, UserRepository, ProductRepository
 from services import ProductService, UserService, AuthService
 from settings import Settings
@@ -18,7 +18,7 @@ from settings import Settings
 
 # Get repositories ----------------------------------------------------------------------------------------------------
 def get_product_repository(
-    db_session: Annotated[Session, Depends(get_db_session)]
+    db_session: Annotated[AsyncSession, Depends(get_async_db_session)]
 ) -> ProductRepository:
     return ProductRepository(db_session=db_session)
 
@@ -29,12 +29,13 @@ def get_product_cache_repository() -> ProductCache:
 
 
 def get_user_repository(
-    db_session: Annotated[Session, Depends(get_db_session)]
+    db_session: Annotated[AsyncSession, Depends(get_async_db_session)]
 ) -> UserRepository:
     return UserRepository(db_session=db_session)
 
 
 # Get clients ---------------------------------------------------------------------------------------------------------
+
 def get_google_client() -> GoogleClient:
     return GoogleClient(settings=Settings())
 

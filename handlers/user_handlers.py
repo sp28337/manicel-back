@@ -5,7 +5,7 @@ from dependencies import get_user_service, get_request_user_id
 from exceptions import (
     UserNameAlreadyExistsException,
     UserEmailAlreadyExistsException,
-    UserIncorrectPasswordException,
+    UserIncorrectPasswordException, UserNotFoundException,
 )
 from schemas import (
     UserCreateSchema,
@@ -24,7 +24,7 @@ async def read_user_profile(
     user_id: Annotated[int, Depends(get_request_user_id)],
     user_service: Annotated[UserService, Depends(get_user_service)],
 ):
-    return user_service.read_user_profile(user_id=user_id)
+    return await user_service.read_user_profile(user_id=user_id)
 
 
 @router.post(path="", response_model=UserLoginSchema)
@@ -33,7 +33,7 @@ async def create_user(
     user_service: Annotated[UserService, Depends(get_user_service)],
 ):
     try:
-        return user_service.create_user(
+        return await user_service.create_user(
             username=body.username, password=body.password, email=body.email
         )
 
@@ -48,7 +48,9 @@ async def update_username(
     user_service: Annotated[UserService, Depends(get_user_service)],
 ):
     try:
-        return user_service.update_username(user_id=user_id, new_username=new_username)
+        return await user_service.update_username(
+            user_id=user_id, new_username=new_username
+        )
 
     except UserNameAlreadyExistsException as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=e.detail)
@@ -60,7 +62,7 @@ async def update_name(
     new_name: str,
     user_service: Annotated[UserService, Depends(get_user_service)],
 ):
-    return user_service.update_name(user_id=user_id, new_name=new_name)
+    return await user_service.update_name(user_id=user_id, new_name=new_name)
 
 
 @router.patch(path="/update_password/{user_id}", response_model=UserProfileSchema)
@@ -70,7 +72,7 @@ async def update_password(
     user_service: Annotated[UserService, Depends(get_user_service)],
 ):
     try:
-        return user_service.update_password(user_id=user_id, body=body)
+        return await user_service.update_password(user_id=user_id, body=body)
 
     except UserIncorrectPasswordException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.detail)
@@ -81,5 +83,7 @@ async def delete_user(
     user_id: Annotated[int, Depends(get_request_user_id)],
     user_service: Annotated[UserService, Depends(get_user_service)],
 ):
-
-    user_service.delete_user(user_id=user_id)
+    try:
+        await user_service.delete_user(user_id=user_id)
+    except UserNotFoundException as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.detail)
