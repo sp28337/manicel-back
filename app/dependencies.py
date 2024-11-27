@@ -21,18 +21,18 @@ from app.settings import Settings
 
 
 # Get repositories ----------------------------------------------------------------------------------------------------
-def get_product_repository(
+async def get_product_repository(
     db_session: Annotated[AsyncSession, Depends(get_async_db_session)]
 ) -> ProductRepository:
     return ProductRepository(db_session=db_session)
 
 
-def get_product_cache_repository() -> ProductCache:
+async def get_product_cache_repository() -> ProductCache:
     redis_connection = get_redis_connection()
     return ProductCache(redis_connection=redis_connection)
 
 
-def get_user_repository(
+async def get_user_repository(
     db_session: Annotated[AsyncSession, Depends(get_async_db_session)]
 ) -> UserRepository:
     return UserRepository(db_session=db_session)
@@ -40,16 +40,16 @@ def get_user_repository(
 
 # Get clients ---------------------------------------------------------------------------------------------------------
 
-def get_google_client() -> GoogleClient:
+async def get_google_client() -> GoogleClient:
     return GoogleClient(settings=Settings())
 
 
-def get_yandex_client() -> YandexClient:
+async def get_yandex_client() -> YandexClient:
     return YandexClient(settings=Settings())
 
 
 # Get services --------------------------------------------------------------------------------------------------------
-def get_product_service(
+async def get_product_service(
     product_repository: Annotated[ProductRepository, Depends(get_product_repository)],
     product_cache: Annotated[ProductCache, Depends(get_product_cache_repository)],
     user_repository: Annotated[UserRepository, Depends(get_user_repository)],
@@ -61,7 +61,7 @@ def get_product_service(
     )
 
 
-def get_auth_service(
+async def get_auth_service(
     user_repository: Annotated[UserRepository, Depends(get_user_repository)],
     google_client: Annotated[GoogleClient, Depends(get_google_client)],
     yandex_client: Annotated[YandexClient, Depends(get_yandex_client)],
@@ -74,7 +74,7 @@ def get_auth_service(
     )
 
 
-def get_user_service(
+async def get_user_service(
     user_repository: Annotated[UserRepository, Depends(get_user_repository)],
     auth_service: Annotated[AuthService, Depends(get_auth_service)],
 ) -> UserService:
@@ -85,14 +85,12 @@ def get_user_service(
 reusable_oauth2 = security.HTTPBearer()
 
 
-def get_request_user_id(
+async def get_request_user_id(
     auth_service: Annotated[AuthService, Depends(get_auth_service)],
     token: Annotated[
         security.http.HTTPAuthorizationCredentials, Security(reusable_oauth2)
     ],
 ) -> int:
-
-    print(f"\ntoken credentials: {token.credentials}\n")
 
     try:
         user_id = auth_service.get_user_id_from_access_token(token.credentials)
