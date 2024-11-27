@@ -39,3 +39,10 @@ async def test_generate_access_token__success(auth_service: AuthService, setting
     decoded_token_expire = dt.datetime.fromtimestamp(decoded_access_token.get("expire"), tz=dt.timezone.utc)
     assert user_id == decoded_user_id
     assert decoded_token_expire - dt.datetime.now(tz=dt.UTC) > dt.timedelta(days=6)
+
+
+async def test_user_id_from_access_token__success(auth_service: AuthService):
+    user_id = 18
+    access_token = auth_service.generate_access_token(user_id)
+    decoded_user_id = auth_service.get_user_id_from_access_token(access_token)
+    assert user_id == decoded_user_id
