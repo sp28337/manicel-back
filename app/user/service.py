@@ -5,14 +5,14 @@ from app.exceptions import (
     UserEmailAlreadyExistsException,
     UserIncorrectPasswordException, UserNotFoundException,
 )
-from app.schemas import (
+from app.user.schemas import (
     UserLoginSchema,
     UserCreateSchema,
     UserProfileSchema,
     UserUpdatePasswordSchema,
 )
-from app.repositories import UserRepository
-from app.services.auth_service import AuthService
+from app.user.repository import UserRepository
+from app.user.auth.service import AuthService
 
 
 @dataclass

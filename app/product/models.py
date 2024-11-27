@@ -3,7 +3,7 @@ from typing import Optional, Annotated, List
 from sqlalchemy import ForeignKey, Table, Column
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import Base
+from app.infrastructure.orm_base import Base
 
 
 intpk = Annotated[int, mapped_column(primary_key=True)]

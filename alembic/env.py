@@ -10,8 +10,9 @@ from sqlalchemy import pool
 from alembic import context
 
 from app.settings import Settings
-from app.models.base import Base
-from app.models import *
+from app.infrastructure.orm_base import Base
+from app.product.models import *
+from app.user.models import *
 
 settings = Settings()
 

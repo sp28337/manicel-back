@@ -3,7 +3,7 @@ import datetime
 from sqlalchemy import text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.base import Base
+from app.infrastructure.orm_base import Base
 
 
 class UserProfile(Base):

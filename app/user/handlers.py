@@ -7,13 +7,13 @@ from app.exceptions import (
     UserEmailAlreadyExistsException,
     UserIncorrectPasswordException, UserNotFoundException,
 )
-from app.schemas import (
+from app.user.schemas import (
     UserCreateSchema,
     UserLoginSchema,
     UserProfileSchema,
     UserUpdatePasswordSchema,
 )
-from app.services import UserService
+from app.user.service import UserService
 
 
 router = APIRouter(prefix="/user", tags=["user"])

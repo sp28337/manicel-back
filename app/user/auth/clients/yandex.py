@@ -1,7 +1,7 @@
 import httpx
 from dataclasses import dataclass
 
-from app.schemas import YandexUserData
+from app.user.auth.schemas import YandexUserData
 from app.settings import Settings
 
 

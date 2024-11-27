@@ -7,8 +7,8 @@ from app.exceptions import (
     ProductNotFoundException,
     PermissionDeniedException,
 )
-from app.schemas import ProductSchema, CreateProductSchema, UpdtaeProductSchema
-from app.services import ProductService
+from app.product.schemas import ProductSchema, CreateProductSchema, UpdtaeProductSchema
+from app.product.service import ProductService
 
 router = APIRouter(prefix="/products", tags=["products"])
 

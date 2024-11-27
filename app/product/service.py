@@ -5,8 +5,10 @@ from app.exceptions import (
     ProductAlreadyExistsException,
     PermissionDeniedException,
 )
-from app.repositories import ProductCache, ProductRepository, UserRepository
-from app.schemas import ProductSchema, CreateProductSchema, UpdtaeProductSchema
+from app.product.repository.cache import ProductCache
+from app.product.repository.database import ProductRepository
+from app.user.repository import UserRepository
+from app.product.schemas import ProductSchema, CreateProductSchema, UpdtaeProductSchema
 
 
 @dataclass

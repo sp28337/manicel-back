@@ -4,11 +4,12 @@ import datetime as dt
 from jose import jwt
 from jose.exceptions import JWTError
 
-from app.clients import GoogleClient, YandexClient
+from app.user.auth.clients.google import GoogleClient
+from app.user.auth.clients.yandex import YandexClient
 from app.exceptions import *
-from app.models import UserProfile
-from app.repositories import UserRepository
-from app.schemas import UserLoginSchema, UserOAuthCreateSchema
+from app.user.models import UserProfile
+from app.user.repository import UserRepository
+from app.user.schemas import UserLoginSchema, UserOAuthCreateSchema
 from app.settings import Settings
 
 

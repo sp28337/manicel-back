@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from redis import asyncio as Redis
 
-from app.schemas.products_schema import ProductSchema
+from app.product.schemas import ProductSchema
 
 
 @dataclass
