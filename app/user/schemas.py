@@ -1,11 +1,13 @@
 import datetime
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, ConfigDict
 
 
 class UserSchema(BaseModel):
     username: str
     password: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserCreateSchema(UserSchema):
@@ -23,27 +25,7 @@ class UserProfileSchema(BaseModel):
     yandex_access_token: str | None
     created_at: datetime.datetime | None
 
-    class Config:
-        from_attributes = True
-
-
-class UserLoginSchema(BaseModel):
-    user_id: int
-    access_token: str
-
-
-class UserOAuthCreateSchema(BaseModel):
-    username: str | None = None
-    email: str | None = None
-    name: str | None = None
-    google_access_token: str | None = None
-    yandex_access_token: str | None = None
-
-    @model_validator(mode="after")
-    def check_google_or_yandex_access_token_is_not_none(self):
-        if self.google_access_token is None and self.yandex_access_token is None:
-            raise ValueError("google or yandex access token must be provided")
-        return self
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserUpdatePasswordSchema(BaseModel):
