@@ -1,19 +1,19 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from dependencies import get_user_service, get_request_user_id
-from exceptions import (
+from app.dependencies import get_user_service, get_request_user_id
+from app.exceptions import (
     UserNameAlreadyExistsException,
     UserEmailAlreadyExistsException,
     UserIncorrectPasswordException, UserNotFoundException,
 )
-from schemas import (
+from app.schemas import (
     UserCreateSchema,
     UserLoginSchema,
     UserProfileSchema,
     UserUpdatePasswordSchema,
 )
-from services import UserService
+from app.services import UserService
 
 
 router = APIRouter(prefix="/user", tags=["user"])

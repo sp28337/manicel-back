@@ -1,18 +1,18 @@
 from dataclasses import dataclass
 
-from exceptions import (
+from app.exceptions import (
     UserNameAlreadyExistsException,
     UserEmailAlreadyExistsException,
     UserIncorrectPasswordException, UserNotFoundException,
 )
-from schemas import (
+from app.schemas import (
     UserLoginSchema,
     UserCreateSchema,
     UserProfileSchema,
     UserUpdatePasswordSchema,
 )
-from repositories import UserRepository
-from services.auth_service import AuthService
+from app.repositories import UserRepository
+from app.services.auth_service import AuthService
 
 
 @dataclass

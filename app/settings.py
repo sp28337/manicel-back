@@ -2,19 +2,19 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    DB_HOST: str = "0.0.0.0"
-    DB_PORT: int = 5432
-    DB_USER: str = "postgres"
-    DB_PASSWORD: str = "password"
-    DB_DRIVER: str = "postgresql+asyncpg"
-    DB_NAME: str = "postgres"
+    DB_HOST: str = ""
+    DB_PORT: int = 7777
+    DB_USER: str = ""
+    DB_PASSWORD: str = ""
+    DB_DRIVER: str = ""
+    DB_NAME: str = ""
 
-    CACHE_HOST: str = "0.0.0.0"
-    CACHE_PORT: int = 6379
+    CACHE_HOST: str = ""
+    CACHE_PORT: int = 7777
     CACHE_DB: int = 0
 
-    JWT_SECRET_KEY: str = "secret_key"
-    JWT_ENCODE_ALHORITHM: str = "HS256"
+    JWT_SECRET_KEY: str = ""
+    JWT_ENCODE_ALHORITHM: str = ""
 
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_SECRET_KEY: str = ""
@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     YANDEX_SECRET_KEY: str = ""
     YANDEX_REDIRECT_URI: str = ""
     YANDEX_TOKEN_URI: str = "https://oauth.yandex.ru/token"
+
+    class Config:
+        env_file = ".local.env"
 
     @property
     def get_db_url(self):

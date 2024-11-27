@@ -1,8 +1,8 @@
 import httpx
 from dataclasses import dataclass
 
-from schemas import GoogleUserData
-from settings import Settings
+from app.schemas import GoogleUserData
+from app.settings import Settings
 
 
 @dataclass

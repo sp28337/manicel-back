@@ -4,16 +4,16 @@ from fastapi import Depends, security, Security, HTTPException, status
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from clients import GoogleClient, YandexClient
-from exceptions import (
+from app.clients import GoogleClient, YandexClient
+from app.exceptions import (
     TokenExpiredException,
     IncorrectTokenException,
 )
-from infrastructure.cache import get_redis_connection
-from infrastructure.database import get_async_db_session
-from repositories import ProductCache, UserRepository, ProductRepository
-from services import ProductService, UserService, AuthService
-from settings import Settings
+from app.infrastructure.cache import get_redis_connection
+from app.infrastructure.database import get_async_db_session
+from app.repositories import ProductCache, UserRepository, ProductRepository
+from app.services import ProductService, UserService, AuthService
+from app.settings import Settings
 
 
 # Get repositories ----------------------------------------------------------------------------------------------------

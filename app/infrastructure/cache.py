@@ -1,6 +1,6 @@
 from redis import asyncio as r
 
-from settings import Settings
+from app.settings import Settings
 
 
 def get_redis_connection() -> r.Redis:

@@ -1,11 +1,11 @@
-from schemas.products_schema import (
+from app.schemas.products_schema import (
     ProductSchema,
     CreateProductSchema,
     UpdtaeProductSchema,
     CategorySchema,
     FlavorSchema,
 )
-from schemas.user_schema import (
+from app.schemas.user_schema import (
     UserLoginSchema,
     UserCreateSchema,
     UserOAuthCreateSchema,
@@ -13,7 +13,7 @@ from schemas.user_schema import (
     UserProfileSchema,
     UserUpdatePasswordSchema,
 )
-from schemas.auth_schema import GoogleUserData, YandexUserData
+from app.schemas.auth_schema import GoogleUserData, YandexUserData
 
 __all__ = [
     "ProductSchema",

@@ -1,18 +1,17 @@
 # import sys
 #
 # from os.path import dirname, abspath
+# sys.path.insert(0, dirname(dirname(dirname(abspath(__file__)))))  # найстройка для корректных импортов из app.
+
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
 
-# sys.path.insert(0, dirname(dirname(dirname(abspath(__file__)))))       # найстройка для корректных импортов
-
-from settings import Settings
-from models.base import Base
-from models import *
-
+from app.settings import Settings
+from app.models.base import Base
+from app.models import *
 
 settings = Settings()
 
@@ -20,7 +19,7 @@ settings = Settings()
 # access to the values within the .ini file in use.
 config = context.config
 
-config.set_main_option("sqlalchemy.url", f"{settings.get_db_url}?async_fallback=true")
+config.set_main_option("sqlalchemy.url", f"{settings.get_db_url}?async_fallback=True")
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

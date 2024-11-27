@@ -1,8 +1,8 @@
 import httpx
 from dataclasses import dataclass
 
-from schemas import YandexUserData
-from settings import Settings
+from app.schemas import YandexUserData
+from app.settings import Settings
 
 
 @dataclass

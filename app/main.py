@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from handlers import routers
+from app.handlers import routers
 
 
 app = FastAPI(title="MANICEL")
