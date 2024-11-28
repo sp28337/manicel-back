@@ -6,11 +6,11 @@ from app.exceptions import (
     UserIncorrectPasswordException, UserNotFoundException,
 )
 from app.user.schemas import (
-    UserLoginSchema,
     UserCreateSchema,
     UserProfileSchema,
     UserUpdatePasswordSchema,
 )
+from app.user.auth.schemas import UserLoginSchema
 from app.user.repository import UserRepository
 from app.user.auth.service import AuthService
 

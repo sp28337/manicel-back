@@ -9,10 +9,10 @@ from app.exceptions import (
 )
 from app.user.schemas import (
     UserCreateSchema,
-    UserLoginSchema,
     UserProfileSchema,
     UserUpdatePasswordSchema,
 )
+from app.user.auth.schemas import UserLoginSchema
 from app.user.service import UserService
 
 

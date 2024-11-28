@@ -4,12 +4,11 @@ import datetime as dt
 from jose import jwt
 from jose.exceptions import JWTError
 
-from app.user.auth.clients.google import GoogleClient
-from app.user.auth.clients.yandex import YandexClient
+from app.user.auth.clients import GoogleClient, YandexClient
 from app.exceptions import *
 from app.user.models import UserProfile
 from app.user.repository import UserRepository
-from app.user.schemas import UserLoginSchema, UserOAuthCreateSchema
+from app.user.auth.schemas import UserLoginSchema, UserOAuthCreateSchema
 from app.settings import Settings
 
 
@@ -25,7 +24,6 @@ class AuthService:
         print(f"\nUSER DATA: {user_data}\n")
 
         if user := await self.user_repository.read_user_by_email(email=user_data.email):
-
             access_token = self.generate_access_token(user_id=user.id)
             print(f"\nUser: {user_data.name} LOGIN\n")
             return UserLoginSchema(user_id=user.id, access_token=access_token)
@@ -36,7 +34,6 @@ class AuthService:
             name=user_data.name,
             google_access_token=user_data.google_access_token,
         )
-
         created_user = await self.user_repository.create_user(create_user_data)
         print(f"\nUser: {user_data.name} CREATED\n")
         access_token = self.generate_access_token(user_id=created_user.id)
@@ -49,7 +46,6 @@ class AuthService:
         if user := await self.user_repository.read_user_by_username(
             username=f"{user_data.login}_{user_data.id}"
         ):
-
             access_token = self.generate_access_token(user_id=user.id)
             print(f"\nUser: {user_data.name} LOGIN\n")
             return UserLoginSchema(user_id=user.id, access_token=access_token)
@@ -60,7 +56,6 @@ class AuthService:
             name=user_data.name,
             yandex_access_token=user_data.yandex_access_token,
         )
-
         created_user = await self.user_repository.create_user(create_user_data)
         print(f"\nUser: {user_data.name} CREATED\n")
         access_token = self.generate_access_token(user_id=created_user.id)
@@ -76,7 +71,6 @@ class AuthService:
         user: UserProfile = await self.user_repository.read_user_by_username(
             username=username
         )
-
         self._validate_auth_user(user, password)
 
         generated_access_token = self.generate_access_token(user_id=user.id)
@@ -93,11 +87,13 @@ class AuthService:
         expires_date_unix = (dt.datetime.now(dt.UTC) + dt.timedelta(days=7)).timestamp()
 
         access_token: str = jwt.encode(
-            claims={"user_id": user_id, "expire": expires_date_unix},
+            claims={
+                "user_id": user_id,
+                "expire": expires_date_unix
+            },
             key=self.settings.JWT_SECRET_KEY,
             algorithm=self.settings.JWT_ENCODE_ALHORITHM,
         )
-
         return access_token
 
     def get_user_id_from_access_token(self, access_token: str) -> int:
