@@ -1,4 +1,4 @@
-import pytest
+import pytest_asyncio
 
 from dataclasses import dataclass
 
@@ -19,6 +19,6 @@ class FakeUserRepository:
         return UserProfileFactory(username=user_data.username)
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def fake_user_repository() -> FakeUserRepository:
     return FakeUserRepository()

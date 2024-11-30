@@ -10,8 +10,6 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres-test
-    volumes:
-      - /home/sp28337/docker_volume/postgres-test:/var/lib/postgresql/data
 
   cache-test:
     image: redis:7.2.4-alpine

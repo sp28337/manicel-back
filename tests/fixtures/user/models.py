@@ -6,8 +6,11 @@ from app.user.models import UserProfile
 
 faker = FakerFactory.create()
 
+EXISTS_GOOGLE_USER_ID = 20
+EXISTS_GOOGLE_EMAIL = "google@gmail.com"
 
-@register(_name="user_profile")
+
+@register(_name="user_profiles")
 class UserProfileFactory(factory.Factory):
 
     class Meta:
@@ -22,4 +25,3 @@ class UserProfileFactory(factory.Factory):
     yandex_access_token = factory.LazyFunction(lambda: faker.sha256())
     google_access_token = None
     created_at = factory.LazyFunction(lambda: faker.date_time())
-

@@ -20,24 +20,25 @@ class AuthService:
     yandex_client: YandexClient
 
     async def google_auth(self, code: str) -> UserLoginSchema:
-        user_data = await self.google_client.get_user_info(code=code)
+        user_data = await self.google_client.get_user_info(code=code)  # ------- Запрос в Google с полученным кодом
         print(f"\nUSER DATA: {user_data}\n")
 
-        if user := await self.user_repository.read_user_by_email(email=user_data.email):
-            access_token = self.generate_access_token(user_id=user.id)
+        if user := await self.user_repository.read_user_by_email(email=user_data.email):  # Если юзер существует -
+            access_token = self.generate_access_token(user_id=user.id)  # ---------------- Генерируем токен доступа
             print(f"\nUser: {user_data.name} LOGIN\n")
             return UserLoginSchema(user_id=user.id, access_token=access_token)
+        else:
+            create_user_data = UserOAuthCreateSchema(
+                username=f"user_{user_data.id}",
+                email=user_data.email,
+                name=user_data.name,
+                google_access_token=user_data.google_access_token,
+            )  # -------------------------------------------------------------------- Если юзера нет - создаем юзера
 
-        create_user_data = UserOAuthCreateSchema(
-            username=f"user_{user_data.id}",
-            email=user_data.email,
-            name=user_data.name,
-            google_access_token=user_data.google_access_token,
-        )
-        created_user = await self.user_repository.create_user(create_user_data)
-        print(f"\nUser: {user_data.name} CREATED\n")
-        access_token = self.generate_access_token(user_id=created_user.id)
-        return UserLoginSchema(user_id=created_user.id, access_token=access_token)
+            created_user = await self.user_repository.create_user(create_user_data)  # -- И записываем в базу данных
+            print(f"\nUser: {user_data.name} CREATED\n")
+            access_token = self.generate_access_token(user_id=created_user.id)  # --------- Генерируем токен доступа
+            return UserLoginSchema(user_id=created_user.id, access_token=access_token)
 
     async def yandex_auth(self, code: str) -> UserLoginSchema:
         user_data = await self.yandex_client.get_user_info(code=code)
