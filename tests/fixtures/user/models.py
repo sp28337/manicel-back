@@ -7,7 +7,7 @@ from app.user.models import UserProfile
 faker = FakerFactory.create()
 
 EXISTS_GOOGLE_USER_ID = 20
-EXISTS_GOOGLE_EMAIL = "google@gmail.com"
+EXISTS_GOOGLE_EMAIL = "tarakanov191094@yandex.ru"
 
 
 @register(_name="user_profiles")

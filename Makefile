@@ -14,6 +14,11 @@ pytests: ## Run tests
 	poetry run docker-compose -f docker-compose.test.yml down
 	poetry run docker-compose -f docker-compose.yml up -d
 
-db-images: ## Start docker-compose
-	poetry run docker-compose -f docker-compose.test.yml down
-	poetry run docker-compose -f docker-compose.yml up -d
+celery: ## Run celery
+	poetry run celery -A worker.celery worker --loglevel=info
+
+redis: ## Connect to redis
+	poetry run docker-compose exec -ti cache-test sh
+
+flower: ## Run flower interface
+	poetry run celery --broker=redis://localhost:6379/0 flower --port=5555

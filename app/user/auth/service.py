@@ -4,7 +4,7 @@ import datetime as dt
 from jose import jwt
 from jose.exceptions import JWTError
 
-from app.user.auth.clients import GoogleClient, YandexClient
+from app.user.auth.clients import GoogleClient, YandexClient, MailClient
 from app.exceptions import *
 from app.user.models import UserProfile
 from app.user.repository import UserRepository
@@ -18,6 +18,7 @@ class AuthService:
     settings: Settings
     google_client: GoogleClient
     yandex_client: YandexClient
+    mail_client: MailClient
 
     async def google_auth(self, code: str) -> UserLoginSchema:
         user_data = await self.google_client.get_user_info(code=code)  # ------- Запрос в Google с полученным кодом
@@ -38,6 +39,7 @@ class AuthService:
             created_user = await self.user_repository.create_user(create_user_data)  # -- И записываем в базу данных
             print(f"\nUser: {user_data.name} CREATED\n")
             access_token = self.generate_access_token(user_id=created_user.id)  # --------- Генерируем токен доступа
+            self.mail_client.send_welcome_email(to=user_data.email)
             return UserLoginSchema(user_id=created_user.id, access_token=access_token)
 
     async def yandex_auth(self, code: str) -> UserLoginSchema:
@@ -60,6 +62,7 @@ class AuthService:
         created_user = await self.user_repository.create_user(create_user_data)
         print(f"\nUser: {user_data.name} CREATED\n")
         access_token = self.generate_access_token(user_id=created_user.id)
+        self.mail_client.send_welcome_email(to=user_data.default_email)
         return UserLoginSchema(user_id=created_user.id, access_token=access_token)
 
     def get_google_redirect_url(self) -> str:

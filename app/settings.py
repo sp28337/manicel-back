@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     CACHE_DB: int = 0
 
     JWT_SECRET_KEY: str = ""
-    JWT_ENCODE_ALHORITHM: str = ""
+    JWT_ENCODE_ALHORITHM: str = "HS256"
 
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_SECRET_KEY: str = ""
@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     YANDEX_SECRET_KEY: str = ""
     YANDEX_REDIRECT_URI: str = ""
     YANDEX_TOKEN_URI: str = "https://oauth.yandex.ru/token"
+
+    CELERY_REDIS_URL: str = "redis://localhost:6379"
+    SMTP_FROM_EMAIL: str = "tarakanov191094@yandex.ru"
+    SMTP_PORT: int = 465
+    SMTP_HOST: str = "smtp.yandex.ru"
+    SMTP_PASSWORD: str = ""
 
     model_config = {
         "env_file": ".local.env"
