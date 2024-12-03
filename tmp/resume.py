@@ -12,7 +12,8 @@ resume = {
     "telegram": "@sp28337",
     "remote_work": True,
     "english": "A2",
-    "certificates": [
-        "https://drive.google.com/file/d/1VU-xmETyL_QbAJVyLU79a3MxlcTOjcss/view?usp=sharing",
-    ],
+    "certificates": {
+        "MySQL": "https://drive.google.com/file/d/1VU-xmETyL_QbAJVyLU79a3MxlcTOjcss/view?usp=sharing",
+        "FastAPI": "https://drive.google.com/file/d/19fQpnTWSrQLid3c-IjLe9YLlqtwVFCzh/view?usp=sharing",
+    },
 }
