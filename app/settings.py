@@ -26,11 +26,7 @@ class Settings(BaseSettings):
     YANDEX_REDIRECT_URI: str = ""
     YANDEX_TOKEN_URI: str = "https://oauth.yandex.ru/token"
 
-    CELERY_BROKER_URL: str = "amqp://guest:guest@localhost:5672//"
-    SMTP_FROM_EMAIL: str = "tarakanov191094@yandex.ru"
-    SMTP_PORT: int = 465
-    SMTP_HOST: str = "smtp.yandex.ru"
-    SMTP_PASSWORD: str = ""
+    AMQP_URL: str = "amqp://guest:guest@localhost:5672//"
 
     model_config = {
         "env_file": ".local.env"
