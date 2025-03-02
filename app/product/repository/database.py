@@ -1,0 +1,109 @@
+from sqlalchemy import update, select, delete
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.product.models import Product
+
+
+class ProductRepository:
+    def __init__(self, db_session: AsyncSession):
+        self.db_session = db_session
+
+    async def read_products(self) -> list[Product] | None:
+        # subquery = (
+        #     session.query(
+        #         Flavor.name.label("flavor"),
+        #         func.aggregate_strings(Ingredient.name, ', ').label("ingredients")
+        #     ).join(flavor_ingredients, Flavor.id == flavor_ingredients.c.flavor_id)
+        #     .join(Ingredient, Ingredient.id == flavor_ingredients.c.ingredient_id)
+        #     .group_by(Flavor.name)
+        #     .subquery()
+        # )  # subquery - подзапрос для получения ингредиентов
+        #
+        # query = (
+        #     session.query(
+        #         Product.name.label("name"),
+        #         Category.name.label("category"),
+        #         Flavor.name.label("flavors"),
+        #         subquery.c.ingredients.label("ingredients"),
+        #         # Products.description.label("description")
+        #     ).join(Category, Product.category_id == Category.id
+        #            ).join(Flavor, Flavor.id == Product.flavor_id
+        #                   ).join(subquery, subquery.c.flavor == Flavor.name)
+        # )  # query - основной запрос для получения продуктов
+        #
+        # products: list[Product] = query.all()
+        stmt = select(Product).order_by(Product.id)
+        result = await self.db_session.execute(stmt)
+        products = result.unique().scalars().all()
+        return products
+
+    async def read_product_by_name(self, product_name: str) -> Product | None:
+        stmt = select(Product).where(Product.name == product_name)
+        result = await self.db_session.execute(stmt)
+        print(f"\n *** result: {result}\n")
+        product = result.scalars().first()
+        print(f"\n *** product: {product}\n")
+        return product
+
+    async def read_product_by_id(self, product_id: int) -> Product | None:
+        # sub_query = (
+        #     session.query(
+        #         Flavor.name.label("flavor"),
+        #         func.aggregate_strings(Ingredient.name, ', ').label("ingredients")
+        #     ).join(flavor_ingredients, Flavor.id == flavor_ingredients.c.flavor_id)
+        #     .join(Ingredient, Ingredient.id == flavor_ingredients.c.ingredient_id)
+        #     .group_by(Flavor.name)
+        #     .subquery()
+        # )  # subquery - подзапрос для получения ингредиентов
+        #
+        # query = (
+        #     session.query(
+        #         Product.name.label("name"),
+        #         Category.name.label("category"),
+        #         Flavor.name.label("flavors"),
+        #         sub_query.c.ingredients.label("ingredients"),
+        #         Product.description.label("description")
+        #     ).join(Category, Product.category_id == Category.id
+        #            ).join(Flavor, Flavor.id == Product.flavor_id
+        #                   ).join(sub_query, sub_query.c.flavor == Flavor.name
+        #                          ).where(Flavor.name == flavor_name)
+        # )  # query - основной запрос для получения продукта
+        #
+        #                       or
+        #
+        # product = session.query(Product).filter(Product.id == product_id).first()
+        #
+        #                       or
+        product = await self.db_session.get(Product, product_id)
+        return product
+
+    async def create_product(self, body: Product) -> int:
+        new_product = Product(
+            name=body.name,
+            description=body.description,
+            category_id=body.category_id,
+            flavor_id=body.flavor_id,
+        )
+        self.db_session.add(new_product)
+        await self.db_session.flush()
+        product_id = new_product.id
+        await self.db_session.commit()
+        return product_id
+
+    async def update_product_name(self, product_id: int, product_name: str) -> Product:
+        stmt = (
+            update(Product)
+            .where(Product.id == product_id)
+            .values(name=product_name)
+            .returning(Product.id)
+        )
+        result = await self.db_session.execute(stmt)
+        product_id = result.scalar_one_or_none()
+
+        await self.db_session.commit()
+        await self.db_session.flush()
+        return await self.read_product_by_id(product_id)
+
+    async def delete_product(self, product_id: int) -> None:
+        await self.db_session.execute(delete(Product).filter(Product.id == product_id))
+        await self.db_session.commit()
