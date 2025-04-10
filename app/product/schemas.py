@@ -20,10 +20,20 @@ class FlavorSchema(DefaultSchema):
     ingredients: list[IngredientSchema]
 
 
+class BestsellerSchema(DefaultSchema):
+    id: int
+    ingredients: list
+    flavor: FlavorSchema | None
+
+
 class ProductSchema(DefaultSchema):
     id: int
     category: CategorySchema
     flavor: FlavorSchema | None
+    reviews: int | None
+    attention: str | None
+    features: str | None
+    result: str | None
 
 
 class CreateProductSchema(DefaultSchema):

@@ -18,6 +18,19 @@ class ProductService:
     product_cache: ProductCache
     user_repository: UserRepository
 
+    async def get_bestsellers(self) -> list[ProductSchema]:
+        if cache_bestsellers := await self.product_cache.get_bestsellers():
+            print("*" * 100)
+            return cache_bestsellers
+        else:
+            print("-" * 100)
+            bestsellers = await self.product_repository.get_bestsellers()
+            bestsellers_schema = [
+                ProductSchema.model_validate(bestseller) for bestseller in bestsellers
+            ]
+            await self.product_cache.set_products(bestsellers_schema)
+            return bestsellers_schema
+
     async def read_products(self) -> list[ProductSchema]:
         if cache_products := await self.product_cache.get_products():
             print("*" * 100)

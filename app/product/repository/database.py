@@ -8,6 +8,12 @@ class ProductRepository:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
 
+    async def get_bestsellers(self) -> list[Product]:
+        stmt = select(Product).order_by(Product.reviews.desc()).limit(5)
+        result = await self.db_session.execute(stmt)
+        bestsellers = result.unique().scalars().all()
+        return bestsellers
+
     async def read_products(self) -> list[Product] | None:
         # subquery = (
         #     session.query(

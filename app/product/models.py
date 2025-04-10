@@ -69,6 +69,10 @@ class Product(Base):
     description: Mapped[Optional[str]]
     flavor_id: Mapped[Optional[int]] = mapped_column(ForeignKey("flavors.id"))
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
+    reviews: Mapped[int | None]
+    attention: Mapped[str]
+    features: Mapped[str]
+    result: Mapped[str]
 
     flavor: Mapped["Flavor"] = relationship(back_populates="products", lazy="joined")
     category: Mapped["Category"] = relationship(back_populates="products", lazy="joined")

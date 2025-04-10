@@ -27,6 +27,29 @@ class ProductCache:
                     f"Оставшееся время жизни ключа '{product_key}': {remaining_ttl} секунд"
                 )
 
+    async def get_bestsellers(self) -> list[ProductSchema] | None:
+        async with self.redis_connection as r:
+            bestseller_json = await r.lrange("bestsellers", 0, -1)
+            return [
+                ProductSchema.model_validate(json.loads(bestseller))
+                for bestseller in bestseller_json
+            ]
+
+    async def set_bestsellers(self, bestsellers: list[ProductSchema] | None):
+        if bestsellers_json := [bestseller.model_dump_json() for bestseller in bestsellers]:
+            async with self.redis_connection as r:
+                list_key = "bestsellers"
+                await r.lpush(
+                    list_key,
+                    *bestsellers_json,
+                )
+                ttl_seconds = 60  # 1 минута
+                await r.expire(list_key, ttl_seconds)
+                remaining_ttl = await r.ttl(list_key)
+                print(
+                    f"Оставшееся время жизни ключа '{list_key}': {remaining_ttl} секунд"
+                )
+
     async def get_products(self) -> list[ProductSchema] | None:
         async with self.redis_connection as r:
             products_json = await r.lrange("products", 0, -1)

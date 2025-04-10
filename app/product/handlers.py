@@ -13,6 +13,13 @@ from app.product.service import ProductService
 router = APIRouter(prefix="/products", tags=["products"])
 
 
+@router.get(path="/bestsellers", response_model=List[ProductSchema])
+async def read_bestsellers(
+    bestsellers_service: Annotated[ProductService, Depends(get_product_service)]
+):
+    return await bestsellers_service.get_bestsellers()
+
+
 @router.get(path="/all", response_model=List[ProductSchema])
 async def read_products(
     product_service: Annotated[ProductService, Depends(get_product_service)]
