@@ -16,6 +16,18 @@ class CategorySchema(DefaultSchema):
     pass
 
 
+class EffectSchema(BaseModel):
+    description: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class VolumeSchema(BaseModel):
+    volume: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class FlavorSchema(DefaultSchema):
     ingredients: list[IngredientSchema]
 
@@ -34,6 +46,8 @@ class ProductSchema(DefaultSchema):
     attention: str | None
     features: str | None
     result: str | None
+    effects: list[EffectSchema]
+    volumes: list[VolumeSchema]
 
 
 class CreateProductSchema(DefaultSchema):
