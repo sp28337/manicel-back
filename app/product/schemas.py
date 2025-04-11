@@ -39,7 +39,8 @@ class BestsellerSchema(DefaultSchema):
 
 
 class ExpirationDateSchema(BaseModel):
-    date: str | None
+    before_opening: str | None
+    after_opening: str | None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -50,11 +51,10 @@ class ProductSchema(DefaultSchema):
     flavor: FlavorSchema | None
     reviews: int | None
     attention: str | None
-    features: str | None
-    result: str | None
     effects: list[EffectSchema]
     volumes: list[VolumeSchema]
     expiration_date: ExpirationDateSchema | None
+    note: str | None
 
 
 class CreateProductSchema(DefaultSchema):
