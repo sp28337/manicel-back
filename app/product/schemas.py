@@ -38,6 +38,12 @@ class BestsellerSchema(DefaultSchema):
     flavor: FlavorSchema | None
 
 
+class ExpirationDateSchema(BaseModel):
+    date: str | None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class ProductSchema(DefaultSchema):
     id: int
     category: CategorySchema
@@ -48,6 +54,7 @@ class ProductSchema(DefaultSchema):
     result: str | None
     effects: list[EffectSchema]
     volumes: list[VolumeSchema]
+    expiration_date: ExpirationDateSchema | None
 
 
 class CreateProductSchema(DefaultSchema):
