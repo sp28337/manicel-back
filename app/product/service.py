@@ -8,7 +8,7 @@ from app.exceptions import (
 from app.product.repository.cache import ProductCache
 from app.product.repository.database import ProductRepository
 from app.user.repository import UserRepository
-from app.product.schemas import ProductSchema, CreateProductSchema, UpdtaeProductSchema
+from app.product.schemas import ProductSchema, CreateProductSchema, UpdtaeProductSchema, ProductCatalogSchema, BestsellerSchema
 
 
 @dataclass
@@ -18,7 +18,7 @@ class ProductService:
     product_cache: ProductCache
     user_repository: UserRepository
 
-    async def get_bestsellers(self) -> list[ProductSchema]:
+    async def get_bestsellers(self) -> list[BestsellerSchema]:
         if cache_bestsellers := await self.product_cache.get_bestsellers():
             print("*" * 100)
             return cache_bestsellers
@@ -26,9 +26,9 @@ class ProductService:
             print("-" * 100)
             bestsellers = await self.product_repository.get_bestsellers()
             bestsellers_schema = [
-                ProductSchema.model_validate(bestseller) for bestseller in bestsellers
+                BestsellerSchema.model_validate(bestseller) for bestseller in bestsellers
             ]
-            await self.product_cache.set_products(bestsellers_schema)
+            await self.product_cache.set_bestsellers(bestsellers_schema)
             return bestsellers_schema
 
     async def read_products(self) -> list[ProductSchema]:
@@ -50,6 +50,28 @@ class ProductService:
             # ) for product in products]
             await self.product_cache.set_products(products_schema)
             return products_schema
+
+    async def read_catalog_products(self) -> list[ProductCatalogSchema]:
+        if cache_catalog_products := await self.product_cache.get_catalog_products():
+            print("*" * 100)
+            return cache_catalog_products
+        else:
+            print("-" * 100)
+            catalog_products = await self.product_repository.read_catalog_products()
+            print("**********************")
+            print(product for product in catalog_products)
+            products_catalog_schema = [
+                ProductCatalogSchema.model_validate(product) for product in catalog_products
+            ]
+            # products_schema = [ProductsSchema(
+            #     id=product.id,
+            #     name=product.name,
+            #     category=product.category,
+            #     flavor=product.flavor,
+            #     description=product.description,
+            # ) for product in products]
+            await self.product_cache.set_catalog_products(products_catalog_schema)
+            return products_catalog_schema
 
     async def read_product(self, product_id: int) -> ProductSchema:
         if cache_product := await self.product_cache.get_product(product_id):

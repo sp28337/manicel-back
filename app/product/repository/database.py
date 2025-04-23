@@ -1,17 +1,31 @@
-from sqlalchemy import update, select, delete
+from sqlalchemy import update, select, delete, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.product.schemas import ProductCatalogSchema, BestsellerSchema
 
-from app.product.models import Product
+from app.product.models import Product, Category, Flavor, Ingredient
 
 
 class ProductRepository:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
 
-    async def get_bestsellers(self) -> list[Product]:
-        stmt = select(Product).order_by(Product.reviews.desc()).limit(5)
+    async def get_bestsellers(self) -> list[BestsellerSchema]:
+        stmt = select(
+            Product.id,
+            Product.name,
+            Product.reviews,
+            func.array_agg(Ingredient.name).label("ingredients"),
+            Category.name.label("type")
+        ).join(Product.category).join(Product.flavor).join(Flavor.ingredients).group_by(Product.id, Category.name, Product.name, Product.reviews).order_by(Product.reviews.desc()).limit(5)
+        print(stmt)
         result = await self.db_session.execute(stmt)
-        bestsellers = result.unique().scalars().all()
+        bestsellers = result.all()
+
+        print(f"\n\n\n{bestsellers}\n\n\n")
+
+        for row in bestsellers:
+            print(row)
+
         return bestsellers
 
     async def read_products(self) -> list[Product] | None:
@@ -41,6 +55,38 @@ class ProductRepository:
         stmt = select(Product).order_by(Product.id)
         result = await self.db_session.execute(stmt)
         products = result.unique().scalars().all()
+        print(f"\n *** products: {products}\n")
+
+        return products
+
+    async def read_catalog_products(self) -> list[ProductCatalogSchema] | None:
+        # subquery = (
+        #     session.query(
+        #         Flavor.name.label("flavor"),
+        #         func.aggregate_strings(Ingredient.name, ', ').label("ingredients")
+        #     ).join(flavor_ingredients, Flavor.id == flavor_ingredients.c.flavor_id)
+        #     .join(Ingredient, Ingredient.id == flavor_ingredients.c.ingredient_id)
+        #     .group_by(Flavor.name)
+        #     .subquery()
+        # )  # subquery - подзапрос для получения ингредиентов
+        #
+        # query = (
+        #     session.query(
+        #         Product.name.label("name"),
+        #         Category.name.label("category"),
+        #         Flavor.name.label("flavors"),
+        #         subquery.c.ingredients.label("ingredients"),
+        #         # Products.description.label("description")
+        #     ).join(Category, Product.category_id == Category.id
+        #            ).join(Flavor, Flavor.id == Product.flavor_id
+        #                   ).join(subquery, subquery.c.flavor == Flavor.name)
+        # )  # query - основной запрос для получения продуктов
+        #
+        # products: list[Product] = query.all()
+        stmt = select(Product.id, Product.name, Product.articule, Category.name.label("type")).join(Product.category).order_by(Product.id)
+        result = await self.db_session.execute(stmt)
+        products = result.unique().all()
+        print(f"\n *** products: {products}\n")
         return products
 
     async def read_product_by_name(self, product_name: str) -> Product | None:

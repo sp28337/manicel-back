@@ -23,7 +23,7 @@ class EffectSchema(BaseModel):
 
 
 class VolumeSchema(BaseModel):
-    volume: int
+    volume: str
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -32,10 +32,14 @@ class FlavorSchema(DefaultSchema):
     ingredients: list[IngredientSchema]
 
 
-class BestsellerSchema(DefaultSchema):
+class BestsellerSchema(BaseModel):
     id: int
-    ingredients: list
-    flavor: FlavorSchema | None
+    name: str
+    reviews: int | None
+    ingredients: list[str]
+    type: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ExpirationDateSchema(BaseModel):
@@ -47,6 +51,7 @@ class ExpirationDateSchema(BaseModel):
 
 class ProductSchema(DefaultSchema):
     id: int
+    articule: int | None
     category: CategorySchema
     flavor: FlavorSchema | None
     reviews: int | None
@@ -55,6 +60,21 @@ class ProductSchema(DefaultSchema):
     volumes: list[VolumeSchema]
     expiration_date: ExpirationDateSchema | None
     note: str | None
+
+
+class CategorySchema(BaseModel):
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ProductCatalogSchema(BaseModel):
+    id: int
+    name: str
+    type: str
+    articule: int
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CreateProductSchema(DefaultSchema):
