@@ -35,6 +35,7 @@ class FlavorSchema(DefaultSchema):
 class BestsellerSchema(BaseModel):
     id: int
     name: str
+    name_ru: str | None
     reviews: int | None
     ingredients: list[str]
     type: str
@@ -52,6 +53,7 @@ class ExpirationDateSchema(BaseModel):
 class ProductSchema(DefaultSchema):
     id: int
     articule: int | None
+    name_ru: str | None
     category: CategorySchema
     flavor: FlavorSchema | None
     reviews: int | None
@@ -71,6 +73,7 @@ class CategorySchema(BaseModel):
 class ProductCatalogSchema(BaseModel):
     id: int
     name: str
+    name_ru: str | None
     type: str
     articule: int
 

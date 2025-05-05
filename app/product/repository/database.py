@@ -1,4 +1,4 @@
-from sqlalchemy import update, select, delete, func
+from sqlalchemy import update, select, delete, func, or_, cast, String
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.product.schemas import ProductCatalogSchema, BestsellerSchema
 
@@ -13,6 +13,7 @@ class ProductRepository:
         stmt = select(
             Product.id,
             Product.name,
+            Product.name_ru,
             Product.reviews,
             func.array_agg(Ingredient.name).label("ingredients"),
             Category.name.label("type")
@@ -83,11 +84,51 @@ class ProductRepository:
         # )  # query - основной запрос для получения продуктов
         #
         # products: list[Product] = query.all()
-        stmt = select(Product.id, Product.name, Product.articule, Category.name.label("type")).join(Product.category).order_by(Product.id)
+        stmt = (
+                select(
+                    Product.id,
+                    Product.name,
+                    Product.name_ru,
+                    Product.articule,
+                    Category.name.label("type")
+                ).join(Product.category).order_by(Product.id)
+        )
         result = await self.db_session.execute(stmt)
         products = result.unique().all()
         print(f"\n *** products: {products}\n")
         return products
+
+    async def search_products(self, query: str) -> list[ProductCatalogSchema] | ProductCatalogSchema:
+        if query == "":
+            return []
+
+        query_string = f"%{query}%"
+
+        print(f"\n\n\nquery_string: {query_string}\n\n\n")
+
+        stmt = (
+            select(
+                Product.id,
+                Product.name,
+                Product.name_ru,
+                Product.articule,
+                Category.name.label("type")
+            ).join(Product.category)
+            .where(
+                or_(
+                    Product.name.ilike(query_string),
+                    Product.name_ru.ilike(query_string),
+                    cast(Product.reviews, String).ilike(query_string),
+                )
+            )
+            .order_by(Product.name).limit(5)
+        )
+
+        result = await self.db_session.execute(stmt)
+        print(f"\n *** result: {result}\n")
+        invoices = result.all()
+        print(f"\n *** invoices: {invoices}\n")
+        return invoices
 
     async def read_product_by_name(self, product_name: str) -> Product | None:
         stmt = select(Product).where(Product.name == product_name)

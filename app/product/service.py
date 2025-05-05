@@ -8,7 +8,13 @@ from app.exceptions import (
 from app.product.repository.cache import ProductCache
 from app.product.repository.database import ProductRepository
 from app.user.repository import UserRepository
-from app.product.schemas import ProductSchema, CreateProductSchema, UpdtaeProductSchema, ProductCatalogSchema, BestsellerSchema
+from app.product.schemas import (
+    ProductSchema,
+    CreateProductSchema,
+    UpdtaeProductSchema,
+    ProductCatalogSchema,
+    BestsellerSchema,
+)
 
 
 @dataclass
@@ -17,6 +23,7 @@ class ProductService:
     product_repository: ProductRepository
     product_cache: ProductCache
     user_repository: UserRepository
+    __CACHE = False
 
     async def get_bestsellers(self) -> list[BestsellerSchema]:
         if cache_bestsellers := await self.product_cache.get_bestsellers():
@@ -28,7 +35,11 @@ class ProductService:
             bestsellers_schema = [
                 BestsellerSchema.model_validate(bestseller) for bestseller in bestsellers
             ]
-            await self.product_cache.set_bestsellers(bestsellers_schema)
+            if self.__CACHE:
+                await self.product_cache.set_bestsellers(bestsellers_schema)
+            else:
+                print(f"\n\n\nNOCACHE\n\n\n")
+
             return bestsellers_schema
 
     async def read_products(self) -> list[ProductSchema]:
@@ -48,7 +59,10 @@ class ProductService:
             #     flavor=product.flavor,
             #     description=product.description,
             # ) for product in products]
-            await self.product_cache.set_products(products_schema)
+            if self.__CACHE:
+                await self.product_cache.set_products(products_schema)
+            else:
+                print(f"\n\n\nNOCACHE\n\n\n")
             return products_schema
 
     async def read_catalog_products(self) -> list[ProductCatalogSchema]:
@@ -70,8 +84,40 @@ class ProductService:
             #     flavor=product.flavor,
             #     description=product.description,
             # ) for product in products]
-            await self.product_cache.set_catalog_products(products_catalog_schema)
+
+            if self.__CACHE:
+                await self.product_cache.set_catalog_products(products_catalog_schema)
+            else:
+                print(f"\n\n\nNOCACHE\n\n\n")
+
             return products_catalog_schema
+
+    async def search_products(self, query: str) -> list[ProductCatalogSchema]:
+        # if cache_catalog_products := await self.product_cache.get_catalog_products():
+        #     print("*" * 100)
+        #     return cache_catalog_products
+        # else:
+        print("-" * 100)
+        search_products = await self.product_repository.search_products(query)
+        print("**********************")
+        print(product for product in search_products)
+        products_search_schema = [
+            ProductCatalogSchema.model_validate(product) for product in search_products
+        ]
+        # products_schema = [ProductsSchema(
+        #     id=product.id,
+        #     name=product.name,
+        #     category=product.category,
+        #     flavor=product.flavor,
+        #     description=product.description,
+        # ) for product in products]
+
+        if self.__CACHE:
+            await self.product_cache.set_catalog_products(products_search_schema)
+        else:
+            print(f"\n\n\nNOCACHE\n\n\n")
+
+        return products_search_schema
 
     async def read_product(self, product_id: int) -> ProductSchema:
         if cache_product := await self.product_cache.get_product(product_id):
