@@ -14,6 +14,7 @@ class ProductCache:
         async with self.redis_connection as r:
             if product_json := await r.get(product_id):
                 return ProductSchema.model_validate(json.loads(product_json))
+            return None
 
     async def set_product(self, product: ProductSchema | None):
         product_key = product.id

@@ -23,7 +23,7 @@ class ProductService:
     product_repository: ProductRepository
     product_cache: ProductCache
     user_repository: UserRepository
-    __CACHE = False
+    __CACHE = True
 
     async def get_bestsellers(self) -> list[BestsellerSchema]:
         if cache_bestsellers := await self.product_cache.get_bestsellers():

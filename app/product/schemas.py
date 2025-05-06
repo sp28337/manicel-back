@@ -50,11 +50,18 @@ class ExpirationDateSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class ComplectationSchema(BaseModel):
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class ProductSchema(DefaultSchema):
     id: int
     articule: int | None
     name_ru: str | None
     category: CategorySchema
+    complectation: ComplectationSchema | None
     flavor: FlavorSchema | None
     reviews: int | None
     attention: str | None
