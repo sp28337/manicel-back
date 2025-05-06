@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.consumer import make_amqp_consumer
 from app.product.handlers import router as product_router
@@ -15,9 +16,15 @@ async def lifespan(app: FastAPI):
     await make_amqp_consumer()
     yield
 
-
 app = FastAPI(title="MANICEL", lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Замените на нужные домены
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 for router in routers:
     app.include_router(router)
