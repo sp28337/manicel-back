@@ -4,7 +4,7 @@ import datetime as dt
 from jose import jwt
 from jose.exceptions import JWTError
 
-from app.user.auth.clients import GoogleClient, YandexClient, MailClient
+from app.user.auth.clients import GoogleClient, YandexClient
 from app.exceptions import *
 from app.user.models import UserProfile
 from app.user.repository import UserRepository
@@ -18,7 +18,6 @@ class AuthService:
     settings: Settings
     google_client: GoogleClient
     yandex_client: YandexClient
-    mail_client: MailClient
 
     async def google_auth(self, code: str) -> UserLoginSchema:
         user_data = await self.google_client.get_user_info(

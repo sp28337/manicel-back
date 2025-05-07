@@ -4,7 +4,7 @@ from fastapi import Depends, security, Security, HTTPException, status
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.user.auth.clients import GoogleClient, YandexClient, MailClient
+from app.user.auth.clients import GoogleClient, YandexClient
 from app.exceptions import (
     TokenExpiredException,
     IncorrectTokenException,
@@ -39,9 +39,6 @@ async def get_user_repository(
 
 
 # Get clients ---------------------------------------------------------------------------------------------------------
-async def get_mail_client() -> MailClient:
-    return MailClient(settings=Settings())
-
 
 async def get_google_client() -> GoogleClient:
     return GoogleClient(settings=Settings())
@@ -68,14 +65,12 @@ async def get_auth_service(
     user_repository: Annotated[UserRepository, Depends(get_user_repository)],
     google_client: Annotated[GoogleClient, Depends(get_google_client)],
     yandex_client: Annotated[YandexClient, Depends(get_yandex_client)],
-    mail_client: Annotated[MailClient, Depends(get_mail_client)],
 ) -> AuthService:
     return AuthService(
         user_repository=user_repository,
         settings=Settings(),
         google_client=google_client,
         yandex_client=yandex_client,
-        mail_client=mail_client,
     )
 
 
