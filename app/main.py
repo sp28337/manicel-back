@@ -16,6 +16,7 @@ async def lifespan(app: FastAPI):
     await make_amqp_consumer()
     yield
 
+
 app = FastAPI(title="MANICEL", lifespan=lifespan)
 
 app.add_middleware(
@@ -28,5 +29,3 @@ app.add_middleware(
 
 for router in routers:
     app.include_router(router)
-
-

@@ -10,14 +10,22 @@ class ProductRepository:
         self.db_session = db_session
 
     async def get_bestsellers(self) -> list[BestsellerSchema]:
-        stmt = select(
-            Product.id,
-            Product.name,
-            Product.name_ru,
-            Product.reviews,
-            func.array_agg(Ingredient.name).label("ingredients"),
-            Category.name.label("type")
-        ).join(Product.category).join(Product.flavor).join(Flavor.ingredients).group_by(Product.id, Category.name, Product.name, Product.reviews).order_by(Product.reviews.desc()).limit(5)
+        stmt = (
+            select(
+                Product.id,
+                Product.name,
+                Product.name_ru,
+                Product.reviews,
+                func.array_agg(Ingredient.name).label("ingredients"),
+                Category.name.label("type"),
+            )
+            .join(Product.category)
+            .join(Product.flavor)
+            .join(Flavor.ingredients)
+            .group_by(Product.id, Category.name, Product.name, Product.reviews)
+            .order_by(Product.reviews.desc())
+            .limit(5)
+        )
         print(stmt)
         result = await self.db_session.execute(stmt)
         bestsellers = result.all()
@@ -85,20 +93,24 @@ class ProductRepository:
         #
         # products: list[Product] = query.all()
         stmt = (
-                select(
-                    Product.id,
-                    Product.name,
-                    Product.name_ru,
-                    Product.articule,
-                    Category.name.label("type")
-                ).join(Product.category).order_by(Product.id)
+            select(
+                Product.id,
+                Product.name,
+                Product.name_ru,
+                Product.articule,
+                Category.name.label("type"),
+            )
+            .join(Product.category)
+            .order_by(Product.id)
         )
         result = await self.db_session.execute(stmt)
         products = result.unique().all()
         print(f"\n *** products: {products}\n")
         return products
 
-    async def search_products(self, query: str) -> list[ProductCatalogSchema] | ProductCatalogSchema:
+    async def search_products(
+        self, query: str
+    ) -> list[ProductCatalogSchema] | ProductCatalogSchema:
         if query == "":
             return []
 
@@ -112,8 +124,9 @@ class ProductRepository:
                 Product.name,
                 Product.name_ru,
                 Product.articule,
-                Category.name.label("type")
-            ).join(Product.category)
+                Category.name.label("type"),
+            )
+            .join(Product.category)
             .where(
                 or_(
                     Product.name.ilike(query_string),
@@ -121,7 +134,8 @@ class ProductRepository:
                     cast(Product.reviews, String).ilike(query_string),
                 )
             )
-            .order_by(Product.name).limit(5)
+            .order_by(Product.name)
+            .limit(5)
         )
 
         result = await self.db_session.execute(stmt)

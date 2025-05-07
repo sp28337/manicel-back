@@ -17,7 +17,7 @@ class MailClient:
         email_body = {
             "message": "Welcome to our mail service!",
             "user_email": to,
-            "subject": "Welcome message"
+            "subject": "Welcome message",
         }
 
         async with connection:
@@ -25,10 +25,9 @@ class MailClient:
             message = aio_pika.Message(
                 body=json.dumps(email_body).encode(),
                 correlation_id=str(uuid.uuid4()),
-                reply_to="callback_mail_queue"
+                reply_to="callback_mail_queue",
             )
             await channel.default_exchange.publish(
-                message=message,
-                routing_key="mail_queue"
+                message=message, routing_key="mail_queue"
             )
         return

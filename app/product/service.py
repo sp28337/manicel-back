@@ -33,7 +33,8 @@ class ProductService:
             print("-" * 100)
             bestsellers = await self.product_repository.get_bestsellers()
             bestsellers_schema = [
-                BestsellerSchema.model_validate(bestseller) for bestseller in bestsellers
+                BestsellerSchema.model_validate(bestseller)
+                for bestseller in bestsellers
             ]
             if self.__CACHE:
                 await self.product_cache.set_bestsellers(bestsellers_schema)
@@ -75,7 +76,8 @@ class ProductService:
             print("**********************")
             print(product for product in catalog_products)
             products_catalog_schema = [
-                ProductCatalogSchema.model_validate(product) for product in catalog_products
+                ProductCatalogSchema.model_validate(product)
+                for product in catalog_products
             ]
             # products_schema = [ProductsSchema(
             #     id=product.id,
@@ -178,11 +180,15 @@ class ProductService:
 
     async def _validate_product_exists(self, product_id_or_name: int | str):
         if type(product_id_or_name) is int:
-            product = await self.product_repository.read_product_by_id(product_id_or_name)
+            product = await self.product_repository.read_product_by_id(
+                product_id_or_name
+            )
             if product is None:
                 raise ProductNotFoundException
 
         elif type(product_id_or_name) is str:
-            product = await self.product_repository.read_product_by_name(product_id_or_name)
+            product = await self.product_repository.read_product_by_name(
+                product_id_or_name
+            )
             if product:
                 raise ProductAlreadyExistsException

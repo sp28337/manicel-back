@@ -28,9 +28,7 @@ class Settings(BaseSettings):
 
     AMQP_URL: str = "amqp://guest:guest@localhost:5672//"
 
-    model_config = {
-        "env_file": ".local.env"
-    }
+    model_config = {"env_file": ".local.env"}
 
     @property
     def get_db_url(self):

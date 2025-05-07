@@ -22,7 +22,7 @@ from app.settings import Settings
 
 # Get repositories ----------------------------------------------------------------------------------------------------
 async def get_product_repository(
-    db_session: Annotated[AsyncSession, Depends(get_async_db_session)]
+    db_session: Annotated[AsyncSession, Depends(get_async_db_session)],
 ) -> ProductRepository:
     return ProductRepository(db_session=db_session)
 
@@ -33,7 +33,7 @@ async def get_product_cache_repository() -> ProductCache:
 
 
 async def get_user_repository(
-    db_session: Annotated[AsyncSession, Depends(get_async_db_session)]
+    db_session: Annotated[AsyncSession, Depends(get_async_db_session)],
 ) -> UserRepository:
     return UserRepository(db_session=db_session)
 

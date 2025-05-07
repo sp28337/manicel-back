@@ -19,4 +19,4 @@ class UserProfile(Base):
     yandex_access_token: Mapped[str | None]
     created_at: Mapped[datetime.datetime] = mapped_column(
         server_default=text("TIMEZONE('utc', NOW())")
-        )
+    )

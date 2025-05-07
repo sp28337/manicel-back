@@ -3,7 +3,8 @@ from dataclasses import dataclass
 from app.exceptions import (
     UserNameAlreadyExistsException,
     UserEmailAlreadyExistsException,
-    UserIncorrectPasswordException, UserNotFoundException,
+    UserIncorrectPasswordException,
+    UserNotFoundException,
 )
 from app.user.schemas import (
     UserCreateSchema,
