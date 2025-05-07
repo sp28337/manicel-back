@@ -26,11 +26,7 @@ class Settings(BaseSettings):
     YANDEX_REDIRECT_URI: str = ""
     YANDEX_TOKEN_URI: str = "https://oauth.yandex.ru/token"
 
-    AMQP_URL: str = "amqp://guest:guest@localhost:5672//"
-
-    model_config = {
-        "env_file": ".local.env"
-    }
+    model_config = {"env_file": ".local.env"}
 
     @property
     def get_db_url(self):

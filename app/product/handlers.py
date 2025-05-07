@@ -7,7 +7,13 @@ from app.exceptions import (
     ProductNotFoundException,
     PermissionDeniedException,
 )
-from app.product.schemas import ProductSchema, CreateProductSchema, UpdtaeProductSchema, ProductCatalogSchema, BestsellerSchema
+from app.product.schemas import (
+    ProductSchema,
+    CreateProductSchema,
+    UpdtaeProductSchema,
+    ProductCatalogSchema,
+    BestsellerSchema,
+)
 from app.product.service import ProductService
 
 router = APIRouter(prefix="/products", tags=["products"])
@@ -15,29 +21,28 @@ router = APIRouter(prefix="/products", tags=["products"])
 
 @router.get(path="/bestsellers", response_model=List[BestsellerSchema])
 async def read_bestsellers(
-    bestsellers_service: Annotated[ProductService, Depends(get_product_service)]
+    bestsellers_service: Annotated[ProductService, Depends(get_product_service)],
 ):
     return await bestsellers_service.get_bestsellers()
 
 
 @router.get(path="/catalog_products", response_model=List[ProductCatalogSchema])
 async def read_catalog_products(
-    product_service: Annotated[ProductService, Depends(get_product_service)]
+    product_service: Annotated[ProductService, Depends(get_product_service)],
 ):
     return await product_service.read_catalog_products()
 
 
 @router.get(path="/search_products", response_model=List[ProductCatalogSchema])
 async def read_search_products(
-    query: str,
-    product_service: Annotated[ProductService, Depends(get_product_service)]
+    query: str, product_service: Annotated[ProductService, Depends(get_product_service)]
 ):
     return await product_service.search_products(query)
 
 
 @router.get(path="/all", response_model=List[ProductSchema])
 async def read_products(
-    product_service: Annotated[ProductService, Depends(get_product_service)]
+    product_service: Annotated[ProductService, Depends(get_product_service)],
 ):
     return await product_service.read_products()
 

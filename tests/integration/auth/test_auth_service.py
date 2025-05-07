@@ -47,11 +47,7 @@ async def test_base_login__success(auth_service, get_db_session):
     password = "test_password"
     email = "test_email"
 
-    stmt = insert(UserProfile).values(
-        username=username,
-        password=password,
-        email=email
-    )
+    stmt = insert(UserProfile).values(username=username, password=password, email=email)
     await get_db_session.execute(stmt)
     await get_db_session.commit()
     await get_db_session.flush()

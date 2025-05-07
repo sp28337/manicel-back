@@ -5,7 +5,8 @@ from app.dependencies import get_user_service, get_request_user_id
 from app.exceptions import (
     UserNameAlreadyExistsException,
     UserEmailAlreadyExistsException,
-    UserIncorrectPasswordException, UserNotFoundException,
+    UserIncorrectPasswordException,
+    UserNotFoundException,
 )
 from app.user.schemas import (
     UserCreateSchema,

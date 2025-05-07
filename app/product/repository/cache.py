@@ -37,7 +37,9 @@ class ProductCache:
             ]
 
     async def set_bestsellers(self, bestsellers: list[BestsellerSchema] | None):
-        if bestsellers_json := [bestseller.model_dump_json() for bestseller in bestsellers]:
+        if bestsellers_json := [
+            bestseller.model_dump_json() for bestseller in bestsellers
+        ]:
             async with self.redis_connection as r:
                 list_key = "bestsellers"
                 await r.lpush(
@@ -84,8 +86,12 @@ class ProductCache:
                 for product in products_json
             ]
 
-    async def set_catalog_products(self, catalog_products: list[ProductCatalogSchema] | None):
-        if catalog_products_json := [product.model_dump_json() for product in catalog_products]:
+    async def set_catalog_products(
+        self, catalog_products: list[ProductCatalogSchema] | None
+    ):
+        if catalog_products_json := [
+            product.model_dump_json() for product in catalog_products
+        ]:
             async with self.redis_connection as r:
                 list_key = "catalog_products"
                 await r.lpush(

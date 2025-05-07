@@ -23,5 +23,5 @@ celery: ## Run celery
 redis: ## Connect to redis
 	poetry run docker-compose exec -ti cache-test sh
 
-flower: ## Run flower interface
-	poetry run celery --broker=redis://localhost:6379/0 flower --port=5555
+#flower: ## Run flower interface
+#	poetry run celery --broker=redis://localhost:6379/0 flower --port=5555
