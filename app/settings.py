@@ -9,8 +9,8 @@ class Settings(BaseSettings):
     DB_DRIVER: str = ""
     DB_NAME: str = ""
 
-    CACHE_HOST: str = ""
-    CACHE_PORT: int = 7777
+    CACHE_HOST: str = "redis"
+    CACHE_PORT: int = 6379
     CACHE_DB: int = 0
 
     JWT_SECRET_KEY: str = ""
