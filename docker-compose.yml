@@ -8,6 +8,8 @@ services:
     depends_on:
       - db
       - redis
+    networks:
+      - bridge
 
   db:
     image: postgres:17.0
