@@ -8,6 +8,8 @@ services:
     depends_on:
       - db
       - redis
+    networks:
+      - manicel
 
   db:
     image: postgres:17.0
@@ -21,14 +23,17 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - /home/sp28337/docker_volume/postgres:/var/lib/postgresql/data
+    networks:
+      - manicel
 
   redis:
     image: redis:7.2.4-alpine
     restart: always
     ports:
       - "6379:6379"
+    networks:
+      - manicel
 
 networks:
-  default:
-    external: True
-    name: manicel
+  manicel:
+    driver: bridge
