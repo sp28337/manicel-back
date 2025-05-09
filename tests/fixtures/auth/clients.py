@@ -15,7 +15,7 @@ class FakeGoogleClient:
     settings: Settings
 
     async def get_user_info(self, code: str) -> dict:
-        google_access_token = self._get_user_access_token(code=code)
+        _google_access_token = self._get_user_access_token(code=code)
         return google_user_info_data()
 
     @staticmethod
@@ -28,7 +28,7 @@ class FakeYandexClient:
     settings: Settings
 
     async def get_user_info(self, code: str) -> dict:
-        yandex_access_token = self._get_user_access_token(code=code)
+        _yandex_access_token = self._get_user_access_token(code=code)
         return yandex_user_info_data()
 
     @staticmethod
