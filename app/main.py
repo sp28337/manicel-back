@@ -19,10 +19,7 @@ app = FastAPI(title="MANICEL", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Замените на нужные домены
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["http://front:3000", "http://localhost:3000"]
 )
 
 for router in routers:
