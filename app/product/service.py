@@ -26,10 +26,10 @@ class ProductService:
 
     async def get_bestsellers(self) -> list[BestsellerSchema]:
         if cache_bestsellers := await self.product_cache.get_bestsellers():
-            print(f"\n[+] bestsellers came from cache")
+            print("\n[+] bestsellers came from cache")
             return cache_bestsellers
         else:
-            print(f"\n[-] bestsellers came from db")
+            print("\n[-] bestsellers came from db")
             bestsellers = await self.product_repository.get_bestsellers()
             bestsellers_schema = [
                 BestsellerSchema.model_validate(bestseller)
@@ -41,11 +41,11 @@ class ProductService:
 
     async def read_products(self) -> list[ProductSchema]:
         if cache_products := await self.product_cache.get_products():
-            print(f"\n[+] products came from cache")
+            print("\n[+] products came from cache")
             return cache_products
         else:
             products = await self.product_repository.read_products()
-            print(f"\n[-] products came from db")
+            print("\n[-] products came from db")
             products_schema = [
                 ProductSchema.model_validate(product) for product in products
             ]
@@ -62,11 +62,11 @@ class ProductService:
 
     async def read_catalog_products(self) -> list[ProductCatalogSchema]:
         if cache_catalog_products := await self.product_cache.get_catalog_products():
-            print(f"\n[+] catalog_products came from cache")
+            print("\n[+] catalog_products came from cache")
             return cache_catalog_products
         else:
             catalog_products = await self.product_repository.read_catalog_products()
-            print(f"\n[-] catalog_products came from db")
+            print("\n[-] catalog_products came from db")
             print(product for product in catalog_products)
             products_catalog_schema = [
                 ProductCatalogSchema.model_validate(product)
@@ -86,7 +86,7 @@ class ProductService:
 
     async def search_products(self, query: str) -> list[ProductCatalogSchema]:
         search_products = await self.product_repository.search_products(query)
-        print(f"\n[-] search_products came from db")
+        print("\n[-] search_products came from db")
         print(product for product in search_products)
         products_search_schema = [
             ProductCatalogSchema.model_validate(product) for product in search_products
@@ -103,11 +103,11 @@ class ProductService:
 
     async def read_product(self, product_id: int) -> ProductSchema:
         if cache_product := await self.product_cache.get_product(product_id):
-            print(f"\n[+] product came from cache")
+            print("\n[+] product came from cache")
             return cache_product
 
         product = await self.product_repository.read_product_by_id(product_id)
-        print(f"\n[-] product came from db")
+        print("\n[-] product came from db")
 
         if product is None:
             raise ProductNotFoundException

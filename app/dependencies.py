@@ -40,6 +40,7 @@ async def get_user_repository(
 
 # Get clients ---------------------------------------------------------------------------------------------------------
 
+
 async def get_google_client() -> GoogleClient:
     return GoogleClient(settings=Settings())
 
