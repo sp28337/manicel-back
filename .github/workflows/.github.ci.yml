@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: ["main", "dev", "refactoring"]
+    branches: ["main", "dev"]
   pull_request:
     branches: ["main", "dev"]
 
@@ -49,8 +49,8 @@ jobs:
 #      - name: Run Unit tests
 #        run: poetry run pytest tests/unit
 
-
   deploy:
+    needs: lint
     runs-on: ubuntu-latest
     environment: manicel
 
