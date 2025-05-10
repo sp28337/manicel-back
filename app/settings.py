@@ -1,4 +1,4 @@
-# import os
+import os
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -28,8 +28,7 @@ class Settings(BaseSettings):
     YANDEX_REDIRECT_URI: str = ""
     YANDEX_TOKEN_URI: str = "https://oauth.yandex.ru/token"
 
-    model_config = SettingsConfigDict(env_file='../.prod.env', env_file_encoding='utf-8')
-    # model_config = {"env_file": f".{os.getenv("ENVIRONMENT")}.env"}
+    model_config = SettingsConfigDict(env_file=f"../.{os.getenv("ENVIRONMENT")}.env", env_file_encoding="utf-8")
 
     @property
     def get_db_url(self):

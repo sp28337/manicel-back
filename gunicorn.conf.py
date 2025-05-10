@@ -7,6 +7,7 @@ bind = "0.0.0.0:8000"
 workers = 4
 worker_class = UvicornWorker
 
+load_dotenv()
 environment = os.getenv("ENVIRONMENT")
 print(f"\nEnvironment: {environment}\n")
 env = os.path.join(os.getcwd(), f".{environment}.env")
