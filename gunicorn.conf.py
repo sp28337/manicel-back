@@ -13,5 +13,3 @@ env = os.path.join(os.getcwd(), f".{environment}.env")
 print(f"\nEnv: {env}\n")
 if os.path.exists(env):
     load_dotenv(env)
-
-print(os.getenv("YANDEX_CLIENT_ID"))
