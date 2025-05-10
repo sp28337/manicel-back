@@ -48,3 +48,27 @@ jobs:
 #          poetry install
 #      - name: Run Unit tests
 #        run: poetry run pytest tests/unit
+
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: manicel
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Deploy to server via SSH
+      run: |
+        ssh -o StrictHostKeyChecking=no sp28337@109.73.207.195 -p 45515 "
+          cd manicel-back &&
+          git pull &&
+          cd .. &&
+          docker compose down &&
+          docker compose up -d
+        "
