@@ -5,7 +5,7 @@ run: ## Run the application
 	poetry run gunicorn app.main:app -c gunicorn.conf.py
 
 docker: ## Run docker
-	poetry run docker-compose -f docker-compose.yml up -d
+	poetry run docker-compose -f docker-compose.yml up db redis -d
 
 migrate-create: ## Create migration
 	alembic revision --autogenerate -m $(NAME)
