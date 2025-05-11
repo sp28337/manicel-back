@@ -6,14 +6,6 @@ from redis import asyncio as Redis
 
 from app.product.schemas import ProductSchema, ProductCatalogSchema, BestsellerSchema
 
-logging.basicConfig(
-    # filename="py_log.log",
-    level=logging.INFO,
-    format=" * [%(asctime)s] [%(levelname)s] %(message)s",
-    datefmt="%y-%m-%d %H:%M:%S",
-    filemode="a"
-)
-
 
 @dataclass
 class ProductCache:
