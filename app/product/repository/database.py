@@ -26,14 +26,8 @@ class ProductRepository:
             .order_by(Product.reviews.desc())
             .limit(5)
         )
-        print(stmt)
         result = await self.db_session.execute(stmt)
         bestsellers = result.all()
-
-        print(f"\n\n\n{bestsellers}\n\n\n")
-
-        for row in bestsellers:
-            print(row)
 
         return bestsellers
 
@@ -64,7 +58,6 @@ class ProductRepository:
         stmt = select(Product).order_by(Product.id)
         result = await self.db_session.execute(stmt)
         products = result.unique().scalars().all()
-        print(f"\n *** products: {products}\n")
 
         return products
 
@@ -105,18 +98,16 @@ class ProductRepository:
         )
         result = await self.db_session.execute(stmt)
         products = result.unique().all()
-        print(f"\n *** products: {products}\n")
         return products
 
     async def search_products(
         self, query: str
     ) -> list[ProductCatalogSchema] | ProductCatalogSchema:
+
         if query == "":
             return []
 
         query_string = f"%{query}%"
-
-        print(f"\n\n\nquery_string: {query_string}\n\n\n")
 
         stmt = (
             select(
@@ -139,17 +130,13 @@ class ProductRepository:
         )
 
         result = await self.db_session.execute(stmt)
-        print(f"\n *** result: {result}\n")
         invoices = result.all()
-        print(f"\n *** invoices: {invoices}\n")
         return invoices
 
     async def read_product_by_name(self, product_name: str) -> Product | None:
         stmt = select(Product).where(Product.name == product_name)
         result = await self.db_session.execute(stmt)
-        print(f"\n *** result: {result}\n")
         product = result.scalars().first()
-        print(f"\n *** product: {product}\n")
         return product
 
     async def read_product_by_id(self, product_id: int) -> Product | None:
