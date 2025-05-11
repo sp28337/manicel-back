@@ -46,7 +46,7 @@ class ProductService:
             logging.info("[CHACHE] get_products")
             return cache_products
         else:
-            products = await self.product_repository.read_products()
+            products = await self.product_repository.get_products()
             logging.info("[DB] get_products")
             products_schema = [
                 ProductSchema.model_validate(product) for product in products
@@ -60,7 +60,7 @@ class ProductService:
             logging.info("[CHACHE] get_catalog_products")
             return cache_catalog_products
         else:
-            catalog_products = await self.product_repository.read_catalog_products()
+            catalog_products = await self.product_repository.get_catalog_products()
             logging.info("[DB] get_catalog_products")
             products_catalog_schema = [
                 ProductCatalogSchema.model_validate(product)
@@ -72,7 +72,7 @@ class ProductService:
             return products_catalog_schema
 
     async def get_search_products(self, query: str) -> list[ProductCatalogSchema]:
-        search_products = await self.product_repository.search_products(query)
+        search_products = await self.product_repository.get_search_products(query)
         logging.info("[DB] get_search_products")
         products_search_schema = [
             ProductCatalogSchema.model_validate(product)
@@ -81,18 +81,18 @@ class ProductService:
 
         return products_search_schema
 
-    async def get_product_by_id(self, product_id: int) -> ProductSchema:
+    async def get_product(self, product_id: int) -> ProductSchema:
         if cache_product := await self.product_cache.get_product(product_id):
             logging.info("[CHACHE] get_product_by_id")
             return cache_product
 
-        product = await self.product_repository.read_product_by_id(product_id)
+        product = await self.product_repository.get_product_by_id(product_id)
         logging.info("[DB] get_product_by_id")
 
         if product is None:
             raise ProductNotFoundException
 
-        product = await self.product_repository.read_product_by_id(product_id)
+        product = await self.product_repository.get_product_by_id(product_id)
         product_schema = ProductSchema.model_validate(product)
         await self.product_cache.set_product(product_schema)
 
@@ -104,7 +104,7 @@ class ProductService:
         await self._validate_admin(user_id)
         await self._validate_product_exists(body.name)
         product_id = await self.product_repository.create_product(body)
-        new_product = await self.product_repository.read_product_by_id(product_id)
+        new_product = await self.product_repository.get_product_by_id(product_id)
         return ProductSchema.model_validate(new_product)
 
     async def update_product_name(
@@ -131,14 +131,14 @@ class ProductService:
 
     async def _validate_product_exists(self, product_id_or_name: int | str):
         if type(product_id_or_name) is int:
-            product = await self.product_repository.read_product_by_id(
+            product = await self.product_repository.get_product_by_id(
                 product_id_or_name
             )
             if product is None:
                 raise ProductNotFoundException
 
         elif type(product_id_or_name) is str:
-            product = await self.product_repository.read_product_by_name(
+            product = await self.product_repository.get_product_by_name(
                 product_id_or_name
             )
             if product:
