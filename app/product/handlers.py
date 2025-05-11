@@ -30,21 +30,21 @@ async def read_bestsellers(
 async def read_catalog_products(
     product_service: Annotated[ProductService, Depends(get_product_service)],
 ):
-    return await product_service.read_catalog_products()
+    return await product_service.get_catalog_products()
 
 
 @router.get(path="/search_products", response_model=List[ProductCatalogSchema])
 async def read_search_products(
     query: str, product_service: Annotated[ProductService, Depends(get_product_service)]
 ):
-    return await product_service.search_products(query)
+    return await product_service.get_search_products(query)
 
 
 @router.get(path="/all", response_model=List[ProductSchema])
 async def read_products(
     product_service: Annotated[ProductService, Depends(get_product_service)],
 ):
-    return await product_service.read_products()
+    return await product_service.get_products()
 
 
 @router.get(path="/{product_id}", response_model=ProductSchema)
@@ -53,7 +53,7 @@ async def read_product(
     product_service: Annotated[ProductService, Depends(get_product_service)],
 ):
     try:
-        new_product: ProductSchema = await product_service.read_product(product_id)
+        new_product: ProductSchema = await product_service.get_product_by_id(product_id)
         return new_product
     except ProductNotFoundException as e:
         raise HTTPException(status_code=404, detail=e.detail)
