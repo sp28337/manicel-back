@@ -1,3 +1,5 @@
+import logging
+
 from sqlalchemy import update, select, delete, func, or_, cast, String
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.product.schemas import ProductCatalogSchema, BestsellerSchema
@@ -31,7 +33,7 @@ class ProductRepository:
 
         return bestsellers
 
-    async def read_products(self) -> list[Product] | None:
+    async def get_products(self) -> list[Product] | None:
         # subquery = (
         #     session.query(
         #         Flavor.name.label("flavor"),
@@ -61,7 +63,7 @@ class ProductRepository:
 
         return products
 
-    async def read_catalog_products(self) -> list[ProductCatalogSchema] | None:
+    async def get_catalog_products(self) -> list[ProductCatalogSchema] | None:
         # subquery = (
         #     session.query(
         #         Flavor.name.label("flavor"),
@@ -100,9 +102,10 @@ class ProductRepository:
         products = result.unique().all()
         return products
 
-    async def search_products(
+    async def get_search_products(
         self, query: str
     ) -> list[ProductCatalogSchema] | ProductCatalogSchema:
+        logging.info(f"[QUERY] {query}")
 
         if query == "":
             return []
@@ -133,13 +136,13 @@ class ProductRepository:
         invoices = result.all()
         return invoices
 
-    async def read_product_by_name(self, product_name: str) -> Product | None:
+    async def get_product_by_name(self, product_name: str) -> Product | None:
         stmt = select(Product).where(Product.name == product_name)
         result = await self.db_session.execute(stmt)
         product = result.scalars().first()
         return product
 
-    async def read_product_by_id(self, product_id: int) -> Product | None:
+    async def get_product_by_id(self, product_id: int) -> Product | None:
         # sub_query = (
         #     session.query(
         #         Flavor.name.label("flavor"),
@@ -196,7 +199,7 @@ class ProductRepository:
 
         await self.db_session.commit()
         await self.db_session.flush()
-        return await self.read_product_by_id(product_id)
+        return await self.get_product_by_id(product_id)
 
     async def delete_product(self, product_id: int) -> None:
         await self.db_session.execute(delete(Product).filter(Product.id == product_id))
