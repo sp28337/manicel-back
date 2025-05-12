@@ -53,7 +53,6 @@ class AuthService:
             access_token = self.generate_access_token(
                 user_id=created_user.id
             )  # --------- Генерируем токен доступа
-            await self.mail_client.send_welcome_email(to=user_data.email)
             return UserLoginSchema(user_id=created_user.id, access_token=access_token)
 
     async def yandex_auth(self, code: str) -> UserLoginSchema:
@@ -76,7 +75,6 @@ class AuthService:
         created_user = await self.user_repository.create_user(create_user_data)
         print(f"\nUser: {user_data.name} CREATED\n")
         access_token = self.generate_access_token(user_id=created_user.id)
-        await self.mail_client.send_welcome_email(to=user_data.default_email)
         return UserLoginSchema(user_id=created_user.id, access_token=access_token)
 
     def get_google_redirect_url(self) -> str:
