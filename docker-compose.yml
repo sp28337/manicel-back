@@ -10,8 +10,8 @@ services:
       - redis
 
   db:
-    user: "1000:1001"
     image: postgres:17.0
+    user: "1000:1001"
     restart: always
     shm_size: 128mb
     ports:
