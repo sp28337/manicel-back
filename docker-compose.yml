@@ -1,5 +1,5 @@
 services:
-  app:
+  backend:
     build:
       dockerfile: ./Dockerfile
       context: ./
@@ -8,6 +8,8 @@ services:
     depends_on:
       - db
       - redis
+    networks:
+      - manicel_network
 
   db:
     image: postgres:17.0
@@ -21,9 +23,16 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - /home/sp28337/docker_volume/postgres:/var/lib/postgresql/data
+    networks:
+      - manicel_network
 
   redis:
     image: redis:7.2.4-alpine
     restart: always
     ports:
       - "6379:6379"
+    networks:
+      - manicel_network
+
+networks:
+  manicel_network:

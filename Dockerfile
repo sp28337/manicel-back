@@ -8,6 +8,8 @@ WORKDIR /app
 
 RUN pip install --upgrade pip wheel "poetry==1.8.3"
 
+# RUN apt-get update && apt-get install -y curl
+
 COPY pyproject.toml poetry.lock ./
 
 RUN poetry config virtualenvs.create false
@@ -18,6 +20,4 @@ COPY . .
 
 EXPOSE 8000
 
-# CMD ["python", "main.py"]
-# CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 CMD ["poetry", "run", "gunicorn", "app.main:app", "-c", "gunicorn.conf.py"]

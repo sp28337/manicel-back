@@ -77,8 +77,6 @@ jobs:
         ssh -o StrictHostKeyChecking=no sp28337@109.73.207.195 -p 45515 "
           cd manicel-back &&
           git pull &&
-          cd .. &&
           docker compose down &&
-          docker compose up -d --build &&
-          docker system prune -af
+          docker compose up -d --build
         "
