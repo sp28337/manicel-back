@@ -1,5 +1,6 @@
 services:
   backend:
+    container_name: backend_container
     build:
       dockerfile: ./Dockerfile
       context: ./
@@ -12,6 +13,7 @@ services:
       - manicel_network
 
   db:
+    container_name: postgres_container
     image: postgres:17.0
     restart: always
     shm_size: 128mb
@@ -27,6 +29,7 @@ services:
       - manicel_network
 
   redis:
+    container_name: redis_container
     image: redis:7.2.4-alpine
     restart: always
     ports:
@@ -36,3 +39,4 @@ services:
 
 networks:
   manicel_network:
+    external: true

@@ -8,7 +8,7 @@ WORKDIR /app
 
 RUN pip install --upgrade pip wheel "poetry==1.8.3"
 
-# RUN apt-get update && apt-get install -y curl
+RUN apt-get update && apt-get install -y curl
 
 COPY pyproject.toml poetry.lock ./
 
