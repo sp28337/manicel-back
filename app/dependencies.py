@@ -9,9 +9,8 @@ from app.exceptions import (
     TokenExpiredException,
     IncorrectTokenException,
 )
-from app.infrastructure.cache_accessor import get_redis_connection
 from app.infrastructure.database_accessor import get_async_db_session
-from app.product.repository import ProductCache, ProductRepository
+from app.product.repository import ProductRepository
 from app.product.service import ProductService
 from app.user.auth.service import AuthService
 from app.user.service import UserService
@@ -25,11 +24,6 @@ async def get_product_repository(
     db_session: Annotated[AsyncSession, Depends(get_async_db_session)],
 ) -> ProductRepository:
     return ProductRepository(db_session=db_session)
-
-
-async def get_product_cache_repository() -> ProductCache:
-    redis_connection = get_redis_connection()
-    return ProductCache(redis_connection=redis_connection)
 
 
 async def get_user_repository(
@@ -52,12 +46,10 @@ async def get_yandex_client() -> YandexClient:
 # Get services --------------------------------------------------------------------------------------------------------
 async def get_product_service(
     product_repository: Annotated[ProductRepository, Depends(get_product_repository)],
-    product_cache: Annotated[ProductCache, Depends(get_product_cache_repository)],
     user_repository: Annotated[UserRepository, Depends(get_user_repository)],
 ) -> ProductService:
     return ProductService(
         product_repository=product_repository,
-        product_cache=product_cache,
         user_repository=user_repository,
     )
 

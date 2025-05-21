@@ -8,7 +8,7 @@ services:
       - '8000:8000'
     depends_on:
       - db
-      - redis
+#      - redis
     networks:
       - manicel_network
 
@@ -28,14 +28,14 @@ services:
     networks:
       - manicel_network
 
-  redis:
-    container_name: redis_container
-    image: redis:7.2.4-alpine
-    restart: always
-    ports:
-      - "6379:6379"
-    networks:
-      - manicel_network
+#  redis:
+#    container_name: redis_container
+#    image: redis:7.2.4-alpine
+#    restart: always
+#    ports:
+#      - "6379:6379"
+#    networks:
+#      - manicel_network
 
 networks:
   manicel_network:

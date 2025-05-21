@@ -11,10 +11,6 @@ class Settings(BaseSettings):
     DB_DRIVER: str = ""
     DB_NAME: str = ""
 
-    CACHE_HOST: str = ""
-    CACHE_PORT: int = 7777
-    CACHE_DB: int = 0
-
     JWT_SECRET_KEY: str = ""
     JWT_ENCODE_ALHORITHM: str = "HS256"
 
