@@ -75,8 +75,6 @@ jobs:
       run:
         |
         ssh -o StrictHostKeyChecking=no sp28337@109.73.207.195 -p 45515 "
-          export PATH="~/.local/bin/poetry" &&
-          export PATH="~/.local/bin:/usr/local/bin:/usr/bin:/bin:$PATH" &&
           export ENVIRONMENT=prod &&
           cd manicel-back &&
           git pull &&
