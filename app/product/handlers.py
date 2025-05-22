@@ -25,13 +25,6 @@ async def get_catalog_products(
     return await product_service.get_catalog_products()
 
 
-@router.get(path="/search_products", response_model=List[ProductCatalogSchema])
-async def get_search_products(
-    query: str, product_service: Annotated[ProductService, Depends(get_product_service)]
-):
-    return await product_service.get_search_products(query)
-
-
 @router.get(path="/all", response_model=List[ProductSchema])
 async def get_products(
     product_service: Annotated[ProductService, Depends(get_product_service)],

@@ -39,16 +39,6 @@ class ProductService:
         ]
         return products_catalog_schema
 
-    async def get_search_products(self, query: str) -> list[ProductCatalogSchema]:
-        search_products = await self.product_repository.get_search_products(query)
-        logging.info("[DB] get_search_products")
-        products_search_schema = [
-            ProductCatalogSchema.model_validate(product)
-            for product in search_products
-        ]
-
-        return products_search_schema
-
     async def get_product(self, product_id: int) -> ProductSchema:
         product = await self.product_repository.get_product_by_id(product_id)
 
