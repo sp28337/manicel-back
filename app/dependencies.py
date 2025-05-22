@@ -11,9 +11,11 @@ from app.exceptions import (
 )
 from app.infrastructure.database_accessor import get_async_db_session
 from app.product.repository import ProductRepository
+from app.search.repository import SearchRepository
 from app.bestsellers.repository import BestsellersRepository
 from app.bestsellers.service import BestsellersService
 from app.product.service import ProductService
+from app.search.service import SearchService
 from app.user.auth.service import AuthService
 from app.user.service import UserService
 from app.user.repository import UserRepository
@@ -26,6 +28,12 @@ async def get_product_repository(
     db_session: Annotated[AsyncSession, Depends(get_async_db_session)],
 ) -> ProductRepository:
     return ProductRepository(db_session=db_session)
+
+
+async def get_search_repository(
+    db_session: Annotated[AsyncSession, Depends(get_async_db_session)],
+) -> SearchRepository:
+    return SearchRepository(db_session=db_session)
 
 
 async def get_bestsellers_repository(
@@ -67,6 +75,14 @@ async def get_bestsellers_service(
 ) -> BestsellersService:
     return BestsellersService(
         bestsellers_repository=bestsellers_repository,
+    )
+
+
+async def get_search_service(
+    search_repository: Annotated[SearchRepository, Depends(get_search_repository)],
+) -> SearchService:
+    return SearchService(
+        search_repository=search_repository,
     )
 
 
