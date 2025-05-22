@@ -12,10 +12,6 @@ class IngredientSchema(DefaultSchema):
     pass
 
 
-class CategorySchema(DefaultSchema):
-    pass
-
-
 class EffectSchema(BaseModel):
     description: str
 
@@ -32,17 +28,6 @@ class FlavorSchema(DefaultSchema):
     ingredients: list[IngredientSchema]
 
 
-class BestsellerSchema(BaseModel):
-    id: int
-    name: str
-    name_ru: str | None
-    reviews: int | None
-    ingredients: list[str]
-    type: str
-
-    model_config = ConfigDict(from_attributes=True)
-
-
 class ExpirationDateSchema(BaseModel):
     before_opening: str | None
     after_opening: str | None
@@ -51,6 +36,12 @@ class ExpirationDateSchema(BaseModel):
 
 
 class ComplectationSchema(BaseModel):
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CategorySchema(BaseModel):
     name: str
 
     model_config = ConfigDict(from_attributes=True)
@@ -69,12 +60,6 @@ class ProductSchema(DefaultSchema):
     volumes: list[VolumeSchema]
     expiration_date: ExpirationDateSchema | None
     note: str | None
-
-
-class CategorySchema(BaseModel):
-    name: str
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 class ProductCatalogSchema(BaseModel):

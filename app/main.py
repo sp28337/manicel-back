@@ -7,13 +7,14 @@ from typing import Annotated
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.bestsellers.handlers import router as bestsellers_router
 from app.product.handlers import router as product_router
 from app.user.handlers import router as user_router
 from app.user.auth.handlers import router as auth_router
 from app.dependencies import get_product_repository
 from app.product.repository import ProductRepository
 
-routers = [product_router, user_router, auth_router]
+routers = [product_router, user_router, auth_router, bestsellers_router]
 
 
 logging.basicConfig(

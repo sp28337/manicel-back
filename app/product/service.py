@@ -14,7 +14,6 @@ from app.product.schemas import (
     CreateProductSchema,
     UpdtaeProductSchema,
     ProductCatalogSchema,
-    BestsellerSchema,
 )
 
 
@@ -22,15 +21,6 @@ from app.product.schemas import (
 class ProductService:
     product_repository: ProductRepository
     user_repository: UserRepository
-
-    async def get_bestsellers(self) -> list[BestsellerSchema]:
-        logging.info("[DB] get_bestsellers")
-        bestsellers = await self.product_repository.get_bestsellers()
-        bestsellers_schema = [
-            BestsellerSchema.model_validate(bestseller)
-            for bestseller in bestsellers
-        ]
-        return bestsellers_schema
 
     async def get_products(self) -> list[ProductSchema]:
         products = await self.product_repository.get_products()
