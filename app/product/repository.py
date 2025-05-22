@@ -1,12 +1,12 @@
 import logging
 
 from fastapi import HTTPException, status
-from sqlalchemy import update, select, delete, func, or_, cast, String
+from sqlalchemy import update, select, delete,  or_, cast, String
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.product.schemas import ProductCatalogSchema, BestsellerSchema
+from app.product.schemas import ProductCatalogSchema
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import text
-from app.product.models import Product, Category, Flavor, Ingredient
+from app.product.models import Product, Category
 
 
 class ProductRepository:
@@ -21,28 +21,6 @@ class ProductRepository:
                 raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                                     detail="Database is not available")
             return {"text": "db is working"}
-
-    async def get_bestsellers(self) -> list[BestsellerSchema]:
-        stmt = (
-            select(
-                Product.id,
-                Product.name,
-                Product.name_ru,
-                Product.reviews,
-                func.array_agg(Ingredient.name).label("ingredients"),
-                Category.name.label("type"),
-            )
-            .join(Product.category)
-            .join(Product.flavor)
-            .join(Flavor.ingredients)
-            .group_by(Product.id, Category.name, Product.name, Product.reviews)
-            .order_by(Product.reviews.desc())
-            .limit(5)
-        )
-        result = await self.db_session.execute(stmt)
-        bestsellers = result.all()
-
-        return bestsellers
 
     async def get_products(self) -> list[Product] | None:
         # subquery = (

@@ -12,18 +12,10 @@ from app.product.schemas import (
     CreateProductSchema,
     UpdtaeProductSchema,
     ProductCatalogSchema,
-    BestsellerSchema,
 )
 from app.product.service import ProductService
 
 router = APIRouter(prefix="/products", tags=["products"])
-
-
-@router.get(path="/bestsellers", response_model=List[BestsellerSchema])
-async def get_bestsellers(
-    bestsellers_service: Annotated[ProductService, Depends(get_product_service)],
-):
-    return await bestsellers_service.get_bestsellers()
 
 
 @router.get(path="/catalog_products", response_model=List[ProductCatalogSchema])
