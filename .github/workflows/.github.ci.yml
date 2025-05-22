@@ -75,11 +75,17 @@ jobs:
       run:
         |
         ssh -o StrictHostKeyChecking=no sp28337@109.73.207.195 -p 45515 "
-          export PATH="~/.local/bin/poetry" &&
-          export PATH="~/.local/bin:/usr/local/bin:/usr/bin:/bin:$PATH" &&
-          export ENVIRONMENT=prod &&
-          cd manicel-back &&
-          git pull &&
-          fuser -k 8000/tcp &&
-          tmux new-session -d "poetry run gunicorn app.main:app -c gunicorn.conf.py"
+          cd ~/manicel-back &&
+          export PATH="~/.local/bin/poetry" ;
+          export PATH="~/.local/bin:/usr/local/bin:/usr/bin:/bin:$PATH" ;
+          export NVM_DIR="/home/sp28337/.nvm" ;
+          [ -s "$NVM_DIR/nvm.sh" ] ;
+          source "~/.nvm/nvm.sh" ;
+          nvm install 22.15.1 &&
+          nvm use 22.15.1 ;
+          git switch dev ;
+          npm install pm2 -g &&
+          pm2 stop backend &&
+          git pull &&  
+          pm2 start backend
         "
