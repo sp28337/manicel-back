@@ -1,6 +1,7 @@
+import datetime
+import enum
 from typing import Optional, Annotated, List
-
-from sqlalchemy import ForeignKey, Table, Column
+from sqlalchemy import ForeignKey, Table, Column, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.orm_base import Base
@@ -8,6 +9,13 @@ from app.infrastructure.orm_base import Base
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
 unique_name = Annotated[str, mapped_column(unique=True)]
+timestamp = Annotated[
+    datetime.datetime,
+    mapped_column(
+        nullable=False,
+        server_default=func.CURRENT_TIMESTAMP()
+    ),
+]
 
 
 flavor_ingredients = Table(
@@ -30,6 +38,15 @@ product_volumes = Table(
     Column("product_id", ForeignKey("products.id"), primary_key=True),
     Column("volume_id", ForeignKey("volumes.id"), primary_key=True),
 )
+
+
+class Status(enum.Enum):
+    AVAILABLE = "available"
+    UNAVAILABLE = "unavailable"
+    LIMITED = "limited"
+    PENDING = "pending"
+    INACTIVE = "inactive"
+    DELETED = "deleted"
 
 
 class Category(Base):
@@ -98,6 +115,9 @@ class Product(Base):
     __tablename__ = "products"
 
     id: Mapped[intpk]
+    uid: Mapped[int] = mapped_column(ForeignKey("user_profiles.id"), nullable=False)
+    created: Mapped[timestamp]
+    status: Mapped[Status]
     articule: Mapped[int | None]
     name: Mapped[unique_name]
     name_ru: Mapped[str | None]

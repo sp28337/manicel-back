@@ -129,10 +129,18 @@ class ProductRepository:
 
     async def create_product(self, body: Product) -> int:
         new_product = Product(
+            status=body.status,
+            articule=body.articule,
             name=body.name,
+            name_ru=body.name_ru,
             description=body.description,
-            category_id=body.category_id,
             flavor_id=body.flavor_id,
+            category_id=body.category_id,
+            complectation_id=body.complectation_id,
+            reviews=body.reviews,
+            attention=body.attention,
+            expiration_date_id=body.expiration_date_id,
+            note=body.note,
         )
         self.db_session.add(new_product)
         await self.db_session.flush()
