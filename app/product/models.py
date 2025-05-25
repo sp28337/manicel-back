@@ -12,7 +12,7 @@ unique_name = Annotated[str, mapped_column(unique=True)]
 timestamp = Annotated[
     datetime.datetime,
     mapped_column(
-        nullable=True,
+        nullable=False,
         server_default=func.CURRENT_TIMESTAMP()
     ),
 ]
@@ -115,9 +115,9 @@ class Product(Base):
     __tablename__ = "products"
 
     id: Mapped[intpk]
-    uid: Mapped[int] = mapped_column(ForeignKey("user_profiles.id"), nullable=True)
+    uid: Mapped[int] = mapped_column(ForeignKey("user_profiles.id"), nullable=False)
     created: Mapped[timestamp]
-    status: Mapped[Status | None]
+    status: Mapped[Status]
     articule: Mapped[int | None]
     name: Mapped[unique_name]
     name_ru: Mapped[str | None]
