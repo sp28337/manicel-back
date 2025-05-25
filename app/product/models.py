@@ -1,7 +1,7 @@
 import datetime
 import enum
 from typing import Optional, Annotated, List
-from sqlalchemy import ForeignKey, Table, Column, DateTime, func
+from sqlalchemy import ForeignKey, Table, Column, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.orm_base import Base
@@ -117,7 +117,7 @@ class Product(Base):
     id: Mapped[intpk]
     uid: Mapped[int] = mapped_column(ForeignKey("user_profiles.id"), nullable=True)
     created: Mapped[timestamp]
-    status: Mapped[Status]
+    status: Mapped[Status | None]
     articule: Mapped[int | None]
     name: Mapped[unique_name]
     name_ru: Mapped[str | None]
