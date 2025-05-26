@@ -28,6 +28,9 @@ services:
     networks:
       - manicel_network
 
+# ! Do not use default redis settings in prod due to high chance to get
+# miner-viruse that make your CPU up to 100% !
+#
 #  redis:
 #    container_name: redis_container
 #    image: redis:7.2.4-alpine

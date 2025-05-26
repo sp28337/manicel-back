@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import HTTPException, status
 from sqlalchemy import update, select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -127,8 +129,9 @@ class ProductRepository:
         product = await self.db_session.get(Product, product_id)
         return product
 
-    async def create_product(self, body: Product) -> int:
+    async def create_product(self, body: Product, uid: int) -> int:
         new_product = Product(
+            uid=uid,
             status=body.status,
             articule=body.articule,
             name=body.name,
@@ -146,6 +149,7 @@ class ProductRepository:
         await self.db_session.flush()
         product_id = new_product.id
         await self.db_session.commit()
+        logging.info(f"[DB] created new product id:{product_id}")
         return product_id
 
     async def update_product_name(self, product_id: int, product_name: str) -> Product:

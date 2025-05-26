@@ -73,8 +73,17 @@ class ProductCatalogSchema(BaseModel):
 
 
 class CreateProductSchema(DefaultSchema):
+    status: str
+    articule: int | None
+    name: str
+    name_ru: str | None
     category_id: int
     flavor_id: int
+    complectation_id: int
+    reviews: int | None
+    attention: str | None
+    expiration_date_id: int | None
+    note: str | None
 
 
 class UpdtaeProductSchema(DefaultSchema):
