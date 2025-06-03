@@ -14,18 +14,21 @@ class UserCreateSchema(UserSchema):
     email: str
 
 
-class UserProfileSchema(BaseModel):
+class ReadUserProfileSchema(BaseModel):
     id: int
     username: str | None
     password: str | None
     name: str | None
     email: str
     admin: bool
-    google_access_token: str | None
-    yandex_access_token: str | None
     created_at: datetime.datetime | None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserProfileSchema(ReadUserProfileSchema):
+    google_access_token: str | None
+    yandex_access_token: str | None
 
 
 class UserUpdatePasswordSchema(BaseModel):

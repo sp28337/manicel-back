@@ -10,6 +10,7 @@ from app.user.schemas import (
     UserCreateSchema,
     UserProfileSchema,
     UserUpdatePasswordSchema,
+    ReadUserProfileSchema,
 )
 from app.user.auth.schemas import UserLoginSchema
 from app.user.repository import UserRepository
@@ -21,7 +22,7 @@ class UserService:
     user_repository: UserRepository
     auth_service: AuthService
 
-    async def read_user_profile(self, user_id: int) -> UserProfileSchema:
+    async def read_user_profile(self, user_id: int) -> ReadUserProfileSchema:
         return await self.user_repository.read_user_by_id(user_id=user_id)
 
     async def create_user(

@@ -12,6 +12,7 @@ from app.user.schemas import (
     UserCreateSchema,
     UserProfileSchema,
     UserUpdatePasswordSchema,
+    ReadUserProfileSchema,
 )
 from app.user.auth.schemas import UserLoginSchema
 from app.user.service import UserService
@@ -20,7 +21,7 @@ from app.user.service import UserService
 router = APIRouter(prefix="/user", tags=["user"])
 
 
-@router.get(path="/profile/{user_id}", response_model=UserProfileSchema)
+@router.get(path="/profile/{user_id}", response_model=ReadUserProfileSchema)
 async def read_user_profile(
     user_id: Annotated[int, Depends(get_request_user_id)],
     user_service: Annotated[UserService, Depends(get_user_service)],
