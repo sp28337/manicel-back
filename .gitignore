@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
 tmp/
+tmp.py
 *SQLAlchemy*
 __pycache__/
 *.py[cod]
