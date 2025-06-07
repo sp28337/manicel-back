@@ -12,6 +12,8 @@ from app.user.schemas import (
     UserCreateSchema,
     UserProfileSchema,
     UserUpdatePasswordSchema,
+    ReadUserProfileSchema,
+    UserUpdateNameSchema,
 )
 from app.user.auth.schemas import UserLoginSchema
 from app.user.service import UserService
@@ -20,7 +22,7 @@ from app.user.service import UserService
 router = APIRouter(prefix="/user", tags=["user"])
 
 
-@router.get(path="/profile/{user_id}", response_model=UserProfileSchema)
+@router.get(path="/profile/{user_id}", response_model=ReadUserProfileSchema)
 async def read_user_profile(
     user_id: Annotated[int, Depends(get_request_user_id)],
     user_service: Annotated[UserService, Depends(get_user_service)],
@@ -60,10 +62,10 @@ async def update_username(
 @router.patch(path="/update_name/{user_id}", response_model=UserProfileSchema)
 async def update_name(
     user_id: Annotated[int, Depends(get_request_user_id)],
-    new_name: str,
+    body: UserUpdateNameSchema,
     user_service: Annotated[UserService, Depends(get_user_service)],
 ):
-    return await user_service.update_name(user_id=user_id, new_name=new_name)
+    return await user_service.update_name(user_id=user_id, body=body)
 
 
 @router.patch(path="/update_password/{user_id}", response_model=UserProfileSchema)

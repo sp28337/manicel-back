@@ -89,8 +89,8 @@ class AuthService:
         )
         self._validate_auth_user(user, password)
 
-        generated_access_token = self.generate_access_token(user_id=user.id)
-        return UserLoginSchema(user_id=user.id, access_token=generated_access_token)
+        access_token = self.generate_access_token(user_id=user.id, access=user.admin)
+        return UserLoginSchema(user_id=user.id, access_token=access_token)
 
     @staticmethod
     def _validate_auth_user(user: UserProfile, password: str) -> None:
@@ -99,11 +99,15 @@ class AuthService:
         if user.password != password:
             raise UserIncorrectPasswordException
 
-    def generate_access_token(self, user_id: int) -> str:
+    def generate_access_token(self, user_id: int, access: bool = False) -> str:
         expires_date_unix = (dt.datetime.now(dt.UTC) + dt.timedelta(days=7)).timestamp()
 
         access_token: str = jwt.encode(
-            claims={"user_id": user_id, "expire": expires_date_unix},
+            claims={
+                "user_id": user_id,
+                "expire": expires_date_unix,
+                "access": access,
+            },
             key=self.settings.JWT_SECRET_KEY,
             algorithm=self.settings.JWT_ENCODE_ALHORITHM,
         )
