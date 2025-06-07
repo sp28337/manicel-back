@@ -15,6 +15,7 @@ from app.user.schemas import (
     ReadUserProfileSchema,
     UserUpdateNameSchema,
     UserUpdateEmailSchema,
+    UserUpdateUsernameSchema,
 )
 from app.user.auth.schemas import UserLoginSchema
 from app.user.service import UserService
@@ -48,12 +49,12 @@ async def create_user(
 @router.patch(path="/update_username/{user_id}", response_model=UserProfileSchema)
 async def update_username(
     user_id: Annotated[int, Depends(get_request_user_id)],
-    new_username: str,
+    body: UserUpdateUsernameSchema,
     user_service: Annotated[UserService, Depends(get_user_service)],
 ):
     try:
         return await user_service.update_username(
-            user_id=user_id, new_username=new_username
+            user_id=user_id, body=body
         )
 
     except UserNameAlreadyExistsException as e:
