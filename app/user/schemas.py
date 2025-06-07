@@ -47,3 +47,9 @@ class UserUpdateNameSchema(BaseModel):
     name: str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserUpdateEmailSchema(BaseModel):
+    email: str | None
+
+    model_config = ConfigDict(from_attributes=True)
