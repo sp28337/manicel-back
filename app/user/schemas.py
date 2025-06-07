@@ -41,3 +41,9 @@ class UserUpdatePasswordSchema(BaseModel):
         if self.new_password != self.repeat_new_password:
             raise ValueError("Passwords do not match")
         return self
+
+
+class UserUpdateNameSchema(BaseModel):
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)

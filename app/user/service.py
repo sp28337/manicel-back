@@ -11,6 +11,7 @@ from app.user.schemas import (
     UserProfileSchema,
     UserUpdatePasswordSchema,
     ReadUserProfileSchema,
+    UserUpdateNameSchema,
 )
 from app.user.auth.schemas import UserLoginSchema
 from app.user.repository import UserRepository
@@ -58,9 +59,9 @@ class UserService:
         )
         return UserProfileSchema.model_validate(updated_user_profile)
 
-    async def update_name(self, user_id: int, new_name: str) -> UserProfileSchema:
+    async def update_name(self, user_id: int, body: UserUpdateNameSchema) -> UserProfileSchema:
         updated_user_profile = await self.user_repository.update_name(
-            user_id=user_id, new_name=new_name
+            user_id=user_id, new_name=body.name
         )
         return UserProfileSchema.model_validate(updated_user_profile)
 

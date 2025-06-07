@@ -13,6 +13,7 @@ from app.user.schemas import (
     UserProfileSchema,
     UserUpdatePasswordSchema,
     ReadUserProfileSchema,
+    UserUpdateNameSchema,
 )
 from app.user.auth.schemas import UserLoginSchema
 from app.user.service import UserService
@@ -61,10 +62,10 @@ async def update_username(
 @router.patch(path="/update_name/{user_id}", response_model=UserProfileSchema)
 async def update_name(
     user_id: Annotated[int, Depends(get_request_user_id)],
-    new_name: str,
+    body: UserUpdateNameSchema,
     user_service: Annotated[UserService, Depends(get_user_service)],
 ):
-    return await user_service.update_name(user_id=user_id, new_name=new_name)
+    return await user_service.update_name(user_id=user_id, body=body)
 
 
 @router.patch(path="/update_password/{user_id}", response_model=UserProfileSchema)
