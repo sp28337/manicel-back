@@ -69,6 +69,16 @@ class UserRepository:
         await self._execute_commit_flush(s=self.db_session, query=stmt)
         return await self.read_user_by_id(user_id)
 
+    async def update_email(self, user_id: int, new_email: str) -> UserProfile:
+        stmt = (
+            update(UserProfile)
+            .where(UserProfile.id == user_id)
+            .values(email=new_email)
+            .returning(UserProfile.id)
+        )
+        await self._execute_commit_flush(s=self.db_session, query=stmt)
+        return await self.read_user_by_id(user_id)
+
     async def update_password(self, user_id: int, new_password: str) -> UserProfile:
         stmt = (
             update(UserProfile)

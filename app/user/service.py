@@ -12,6 +12,7 @@ from app.user.schemas import (
     UserUpdatePasswordSchema,
     ReadUserProfileSchema,
     UserUpdateNameSchema,
+    UserUpdateEmailSchema,
 )
 from app.user.auth.schemas import UserLoginSchema
 from app.user.repository import UserRepository
@@ -62,6 +63,15 @@ class UserService:
     async def update_name(self, user_id: int, body: UserUpdateNameSchema) -> UserProfileSchema:
         updated_user_profile = await self.user_repository.update_name(
             user_id=user_id, new_name=body.name
+        )
+        return UserProfileSchema.model_validate(updated_user_profile)
+
+    async def update_email(self, user_id: int, body: UserUpdateEmailSchema) -> UserProfileSchema:
+        if await self.user_repository.read_user_by_email(email=body.email):
+            raise UserEmailAlreadyExistsException
+
+        updated_user_profile = await self.user_repository.update_email(
+            user_id=user_id, new_email=body.email
         )
         return UserProfileSchema.model_validate(updated_user_profile)
 
