@@ -92,7 +92,7 @@ async def update_password(
         return await user_service.update_password(user_id=user_id, body=body)
 
     except UserIncorrectPasswordException as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.detail)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.detail)
 
 
 @router.delete(path="/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
