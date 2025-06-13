@@ -85,6 +85,7 @@ jobs:
           nvm use 22.15.1 ;
           git switch dev ;
           npm install pm2 -g &&
+          pm2 update &&
           pm2 stop backend &&
           git pull &&  
           pm2 start backend

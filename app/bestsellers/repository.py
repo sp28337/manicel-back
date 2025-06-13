@@ -12,6 +12,7 @@ class BestsellersRepository:
     async def get_bestsellers(self) -> list[BestsellersSchema]:
         stmt = (
             select(
+                Product.articule,
                 Product.id,
                 Product.name,
                 Product.name_ru,
