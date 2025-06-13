@@ -2,6 +2,7 @@ from pydantic import BaseModel, ConfigDict
 
 
 class BestsellersSchema(BaseModel):
+    articule: int
     id: int
     name: str
     name_ru: str | None
