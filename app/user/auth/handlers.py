@@ -41,12 +41,49 @@ async def yandex_login(auth_service: Annotated[AuthService, Depends(get_auth_ser
 async def google_auth(
     auth_service: Annotated[AuthService, Depends(get_auth_service)], code: str
 ):
-    return await auth_service.google_auth(code=code)
+    user_data = await auth_service.google_auth(code=code)
+    redirect = RedirectResponse("http://localhost:3000/callback")
+    redirect.set_cookie(
+        key="session",
+        value=user_data.access_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=3600
+    )
+    redirect.set_cookie(
+        key="id",
+        value=user_data.user_id,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=3600
+    )
+    return redirect
+    # return await auth_service.google_auth(code=code)
 
 
 @router.get(path="/yandex")
 async def yandex_auth(
     auth_service: Annotated[AuthService, Depends(get_auth_service)], code: str
 ):
-    print(f"\n1) Код, который yandex присылает для второго запроса\ncode: {code}\n")
-    return await auth_service.yandex_auth(code=code)
+    user_data = await auth_service.yandex_auth(code=code)
+    redirect = RedirectResponse("http://localhost:3000/callback")
+    redirect.set_cookie(
+        key="session",
+        value=user_data.access_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=3600
+    )
+    redirect.set_cookie(
+        key="id",
+        value=user_data.user_id,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=3600
+    )
+    return redirect
+    # return await auth_service.yandex_auth(code=code)
