@@ -7,6 +7,7 @@ from app.exceptions import UserNotFoundException, UserIncorrectPasswordException
 from app.user.schemas import UserSchema
 from app.user.auth.schemas import UserLoginSchema
 from app.user.auth.service import AuthService
+from app.settings import Settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -42,7 +43,7 @@ async def google_auth(
     auth_service: Annotated[AuthService, Depends(get_auth_service)], code: str
 ):
     user_data = await auth_service.google_auth(code=code)
-    redirect = RedirectResponse("http://localhost:3000/callback")
+    redirect = RedirectResponse(Settings().CALLBACK_REDIRECT_URI)
     redirect.set_cookie(
         key="session",
         value=user_data.access_token,
@@ -68,7 +69,7 @@ async def yandex_auth(
     auth_service: Annotated[AuthService, Depends(get_auth_service)], code: str
 ):
     user_data = await auth_service.yandex_auth(code=code)
-    redirect = RedirectResponse("http://localhost:3000/callback")
+    redirect = RedirectResponse(Settings().CALLBACK_REDIRECT_URI)
     redirect.set_cookie(
         key="session",
         value=user_data.access_token,

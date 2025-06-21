@@ -32,5 +32,4 @@ class GoogleClient:
             response = await client.post(
                 self.settings.GOOGLE_TOKEN_URL, data=request_body
             )
-            print(response.json())
             return response.json()["access_token"]
