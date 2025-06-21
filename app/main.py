@@ -46,9 +46,12 @@ app.add_middleware(
         "http://frontend:3000",
         "http://localhost:3000",
         "http://109.73.207.195:3000",
-        "https://109.73.207.195:3000",
+        "http://localhost:3000/sign-up",
+        "http://localhost:3000/login",
         "https://manicel.ru",
-        "http://localhost:3000/sign-up"
+        "https://109.73.207.195:3000",
+        "https://manicel.ru/sign-up",
+        "https://manicel.ru/login"
     ]
 )
 
