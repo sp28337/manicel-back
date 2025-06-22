@@ -44,7 +44,7 @@ class AuthService:
                 email=user_data.email,
                 name=user_data.name,
                 google_access_token=user_data.google_access_token,
-            )  # -------------------------------------------------------------------- Если юзера нет - создаем юзера
+            )  # ------------------ Если юзера нет - создаем юзера
 
             created_user = await self.user_repository.create_user(
                 create_user_data
