@@ -71,9 +71,10 @@ async def yandex_auth(
     auth_service: Annotated[AuthService, Depends(get_auth_service)], code: str
 ):
     user_data = await auth_service.yandex_auth(code=code)
-    redirect = RedirectResponse(Settings().CALLBACK_REDIRECT_URI)
+    redirect = RedirectResponse(settings.CALLBACK_REDIRECT_URI)
     redirect.set_cookie(
         key="session",
+        domain=settings.COOKIES_DOMAIN,
         value=user_data.access_token,
         httponly=True,
         secure=True,
@@ -82,6 +83,7 @@ async def yandex_auth(
     )
     redirect.set_cookie(
         key="id",
+        domain=settings.COOKIES_DOMAIN,
         value=user_data.user_id,
         httponly=True,
         secure=True,
