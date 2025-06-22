@@ -10,6 +10,7 @@ from app.user.auth.service import AuthService
 from app.settings import Settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+settings = Settings()
 
 
 @router.post(path="/login", response_model=UserLoginSchema)
@@ -43,9 +44,10 @@ async def google_auth(
     auth_service: Annotated[AuthService, Depends(get_auth_service)], code: str
 ):
     user_data = await auth_service.google_auth(code=code)
-    redirect = RedirectResponse(Settings().CALLBACK_REDIRECT_URI)
+    redirect = RedirectResponse(settings.CALLBACK_REDIRECT_URI)
     redirect.set_cookie(
         key="session",
+        domain=settings.COOKIES_DOMAIN,
         value=user_data.access_token,
         httponly=True,
         secure=True,
@@ -54,6 +56,7 @@ async def google_auth(
     )
     redirect.set_cookie(
         key="id",
+        domain=settings.COOKIES_DOMAIN,
         value=user_data.user_id,
         httponly=True,
         secure=True,
@@ -61,7 +64,6 @@ async def google_auth(
         max_age=3600
     )
     return redirect
-    # return await auth_service.google_auth(code=code)
 
 
 @router.get(path="/yandex")
@@ -87,4 +89,3 @@ async def yandex_auth(
         max_age=3600
     )
     return redirect
-    # return await auth_service.yandex_auth(code=code)

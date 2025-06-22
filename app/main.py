@@ -40,19 +40,18 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="MANICEL", lifespan=lifespan)
 
+origins = [
+    "http://frontend:3000",
+    "http://localhost:3000",
+    "https://manicel.ru",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://frontend:3000",
-        "http://localhost:3000",
-        "http://109.73.207.195:3000",
-        "http://localhost:3000/sign-up",
-        "http://localhost:3000/login",
-        "https://manicel.ru",
-        "https://109.73.207.195:3000",
-        "https://manicel.ru/sign-up",
-        "https://manicel.ru/login"
-    ]
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 for router in routers:

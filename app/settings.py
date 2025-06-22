@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     YANDEX_TOKEN_URI: str = "https://oauth.yandex.ru/token"
 
     CALLBACK_REDIRECT_URI: str = ""
+    COOKIES_DOMAIN: str = ""
 
     # model_config = SettingsConfigDict(env_file=f"../.{os.getenv("ENVIRONMENT")}.env", env_file_encoding="utf-8")
     model_config = {
