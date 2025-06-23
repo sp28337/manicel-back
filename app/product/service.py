@@ -77,7 +77,7 @@ class ProductService:
     async def _validate_admin(self, user_id: int) -> bool:
         user = await self.user_repository.read_user_by_id(user_id)
         print(f"\nuser_is_admin: {user.admin}\n")
-        if user.admin is False:
+        if not user.admin:
             raise PermissionDeniedException
 
     async def _validate_product_exists(self, product_id_or_name: int | str):

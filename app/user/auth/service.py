@@ -25,45 +25,40 @@ class AuthService:
     yandex_client: YandexClient
 
     async def google_auth(self, code: str) -> UserLoginSchema:
-        user_data = await self.google_client.get_user_info(
-            code=code
-        )  # ------- Запрос в Google с полученным кодом
-        print(f"\nUSER DATA: {user_data}\n")
+        # -- Запрос в Google с полученным кодом
+        user_data = await self.google_client.get_user_info(code=code)
 
+        # -- Если юзер существует
         if user := await self.user_repository.read_user_by_email(
             email=user_data.email
-        ):  # Если юзер существует -
-            access_token = self.generate_access_token(
-                user_id=user.id
-            )  # ---------------- Генерируем токен доступа
-            print(f"\nUser: {user_data.name} LOGIN\n")
+        ):
+            # -- Генерируем токен доступа
+            access_token = self.generate_access_token(user_id=user.id)
             return UserLoginSchema(user_id=user.id, access_token=access_token)
-        else:
+        else:  # -- Если юзера нет - создаем юзера
             create_user_data = UserOAuthCreateSchema(
                 username=f"user_{user_data.id}",
                 email=user_data.email,
                 name=user_data.name,
                 google_access_token=user_data.google_access_token,
-            )  # ------------------ Если юзера нет - создаем юзера
-
+            )
+            # -- И записываем в базу данных
             created_user = await self.user_repository.create_user(
                 create_user_data
-            )  # -- И записываем в базу данных
-            print(f"\nUser: {user_data.name} CREATED\n")
+            )
+            # -- Генерируем токен доступа
             access_token = self.generate_access_token(
                 user_id=created_user.id
-            )  # --------- Генерируем токен доступа
+            )
             return UserLoginSchema(user_id=created_user.id, access_token=access_token)
 
     async def yandex_auth(self, code: str) -> UserLoginSchema:
         user_data = await self.yandex_client.get_user_info(code=code)
-        print(f"\n5) USER DATA FROM YANDEX: {user_data}\n")
 
-        if user := await self.user_repository.read_user_by_username(
-            username=f"{user_data.login}_{user_data.id}"
+        if user := await self.user_repository.read_user_by_email(
+            email=user_data.default_email
         ):
             access_token = self.generate_access_token(user_id=user.id)
-            print(f"\nUser: {user_data.name} LOGIN\n")
             return UserLoginSchema(user_id=user.id, access_token=access_token)
 
         create_user_data = UserOAuthCreateSchema(
@@ -73,7 +68,6 @@ class AuthService:
             yandex_access_token=user_data.yandex_access_token,
         )
         created_user = await self.user_repository.create_user(create_user_data)
-        print(f"\nUser: {user_data.name} CREATED\n")
         access_token = self.generate_access_token(user_id=created_user.id)
         return UserLoginSchema(user_id=created_user.id, access_token=access_token)
 
