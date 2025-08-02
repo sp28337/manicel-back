@@ -26,9 +26,7 @@ class Settings(BaseSettings):
     COOKIES_DOMAIN: str = ""
 
     # model_config = SettingsConfigDict(env_file=f"../.{os.getenv("ENVIRONMENT")}.env", env_file_encoding="utf-8")
-    model_config = {
-        "env_file": ".local.env"
-    }
+    model_config = {"env_file": ".local.env"}
 
     @property
     def get_db_url(self):

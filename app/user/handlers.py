@@ -53,9 +53,7 @@ async def update_username(
     user_service: Annotated[UserService, Depends(get_user_service)],
 ):
     try:
-        return await user_service.update_username(
-            user_id=user_id, body=body
-        )
+        return await user_service.update_username(user_id=user_id, body=body)
 
     except UserNameAlreadyExistsException as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=e.detail)

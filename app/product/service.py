@@ -34,8 +34,7 @@ class ProductService:
         catalog_products = await self.product_repository.get_catalog_products()
         logging.info("[DB] get_catalog_products")
         products_catalog_schema = [
-            ProductCatalogSchema.model_validate(product)
-            for product in catalog_products
+            ProductCatalogSchema.model_validate(product) for product in catalog_products
         ]
         return products_catalog_schema
 
@@ -54,7 +53,9 @@ class ProductService:
     ) -> ProductSchema:
         await self._validate_admin(user_id)
         await self._validate_product_exists(body.name)
-        product_id = await self.product_repository.create_product(body=body, uid=user_id)
+        product_id = await self.product_repository.create_product(
+            body=body, uid=user_id
+        )
         new_product = await self.product_repository.get_product_by_id(product_id)
         return ProductSchema.model_validate(new_product)
 

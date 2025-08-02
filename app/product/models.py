@@ -11,10 +11,7 @@ intpk = Annotated[int, mapped_column(primary_key=True)]
 unique_name = Annotated[str, mapped_column(unique=True)]
 timestamp = Annotated[
     datetime.datetime,
-    mapped_column(
-        nullable=False,
-        server_default=func.CURRENT_TIMESTAMP()
-    ),
+    mapped_column(nullable=False, server_default=func.CURRENT_TIMESTAMP()),
 ]
 
 

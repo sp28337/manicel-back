@@ -14,7 +14,6 @@ class BestsellersService:
         logging.info("[DB] get_bestsellers")
         bestsellers = await self.bestsellers_repository.get_bestsellers()
         bestsellers_schema = [
-            BestsellersSchema.model_validate(bestseller)
-            for bestseller in bestsellers
+            BestsellersSchema.model_validate(bestseller) for bestseller in bestsellers
         ]
         return bestsellers_schema

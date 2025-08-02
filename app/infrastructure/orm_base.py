@@ -6,6 +6,4 @@ from sqlalchemy.ext.asyncio import AsyncAttrs
 
 
 class Base(AsyncAttrs, DeclarativeBase):
-    type_annotation_map = {
-        enum.Enum: sqlalchemy.Enum(enum.Enum, native_enum=False)
-    }
+    type_annotation_map = {enum.Enum: sqlalchemy.Enum(enum.Enum, native_enum=False)}
