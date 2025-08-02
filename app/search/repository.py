@@ -11,7 +11,7 @@ class SearchRepository:
         self.db_session = db_session
 
     async def get_search_products(
-            self, query: str
+        self, query: str
     ) -> list[SearchSchema] | SearchSchema:
         logging.info(f"[QUERY] {query}")
 

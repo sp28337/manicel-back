@@ -6,7 +6,11 @@ from app.user.repository import UserRepository
 
 
 @pytest_asyncio.fixture
-def mock_auth_service(yandex_client, google_client, fake_user_repository):
+def mock_auth_service(
+    yandex_client,
+    google_client,
+    fake_user_repository,
+):
     return AuthService(
         user_repository=fake_user_repository,
         settings=Settings(),
@@ -16,7 +20,12 @@ def mock_auth_service(yandex_client, google_client, fake_user_repository):
 
 
 @pytest_asyncio.fixture
-def auth_service(yandex_client, google_client, mock_auth_service, get_db_session):
+def auth_service(
+    yandex_client,
+    google_client,
+    mock_auth_service,
+    get_db_session,
+):
     return AuthService(
         user_repository=UserRepository(db_session=get_db_session),
         settings=Settings(),

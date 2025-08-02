@@ -14,8 +14,7 @@ class SearchService:
         search_products = await self.search_repository.get_search_products(query)
         logging.info("[DB] get_search_products")
         search_products_schema = [
-            SearchSchema.model_validate(product)
-            for product in search_products
+            SearchSchema.model_validate(product) for product in search_products
         ]
 
         return search_products_schema

@@ -52,7 +52,7 @@ async def google_auth(
         httponly=True,
         secure=True,
         samesite="lax",
-        max_age=3600
+        max_age=3600,
     )
     redirect.set_cookie(
         key="id",
@@ -61,7 +61,7 @@ async def google_auth(
         httponly=True,
         secure=True,
         samesite="lax",
-        max_age=3600
+        max_age=3600,
     )
     return redirect
 
@@ -79,7 +79,7 @@ async def yandex_auth(
         httponly=True,
         secure=True,
         samesite="lax",
-        max_age=3600
+        max_age=3600,
     )
     redirect.set_cookie(
         key="id",
@@ -88,6 +88,6 @@ async def yandex_auth(
         httponly=True,
         secure=True,
         samesite="lax",
-        max_age=3600
+        max_age=3600,
     )
     return redirect
