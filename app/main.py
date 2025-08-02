@@ -15,13 +15,7 @@ from app.user.auth.handlers import router as auth_router
 from app.dependencies import get_product_repository
 from app.product.repository import ProductRepository
 
-routers = [
-    product_router,
-    user_router,
-    auth_router,
-    bestsellers_router,
-    search_router
-]
+routers = [product_router, user_router, auth_router, bestsellers_router, search_router]
 
 
 logging.basicConfig(
@@ -29,7 +23,7 @@ logging.basicConfig(
     level=logging.INFO,
     format=" * [%(asctime)s] [%(levelname)s] %(message)s",
     datefmt="%y-%m-%d %H:%M:%S",
-    filemode="a"
+    filemode="a",
 )
 
 
@@ -64,5 +58,7 @@ async def ping_app():
 
 
 @app.get("/db/ping")
-async def ping_db(task_repository: Annotated[ProductRepository, Depends(get_product_repository)]):
+async def ping_db(
+    task_repository: Annotated[ProductRepository, Depends(get_product_repository)],
+):
     await task_repository.ping_db()

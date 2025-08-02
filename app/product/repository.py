@@ -18,34 +18,13 @@ class ProductRepository:
             try:
                 await session.execute(text("SELECT 1"))
             except IntegrityError:
-                raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                                    detail="Database is not available")
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Database is not available",
+                )
             return {"text": "db is working"}
 
     async def get_products(self) -> list[Product] | None:
-        # subquery = (
-        #     session.query(
-        #         Flavor.name.label("flavor"),
-        #         func.aggregate_strings(Ingredient.name, ', ').label("ingredients")
-        #     ).join(flavor_ingredients, Flavor.id == flavor_ingredients.c.flavor_id)
-        #     .join(Ingredient, Ingredient.id == flavor_ingredients.c.ingredient_id)
-        #     .group_by(Flavor.name)
-        #     .subquery()
-        # )  # subquery - подзапрос для получения ингредиентов
-        #
-        # query = (
-        #     session.query(
-        #         Product.name.label("name"),
-        #         Category.name.label("category"),
-        #         Flavor.name.label("flavors"),
-        #         subquery.c.ingredients.label("ingredients"),
-        #         # Products.description.label("description")
-        #     ).join(Category, Product.category_id == Category.id
-        #            ).join(Flavor, Flavor.id == Product.flavor_id
-        #                   ).join(subquery, subquery.c.flavor == Flavor.name)
-        # )  # query - основной запрос для получения продуктов
-        #
-        # products: list[Product] = query.all()
         stmt = select(Product).order_by(Product.id)
         result = await self.db_session.execute(stmt)
         products = result.unique().scalars().all()
@@ -53,29 +32,6 @@ class ProductRepository:
         return products
 
     async def get_catalog_products(self) -> list[ProductCatalogSchema] | None:
-        # subquery = (
-        #     session.query(
-        #         Flavor.name.label("flavor"),
-        #         func.aggregate_strings(Ingredient.name, ', ').label("ingredients")
-        #     ).join(flavor_ingredients, Flavor.id == flavor_ingredients.c.flavor_id)
-        #     .join(Ingredient, Ingredient.id == flavor_ingredients.c.ingredient_id)
-        #     .group_by(Flavor.name)
-        #     .subquery()
-        # )  # subquery - подзапрос для получения ингредиентов
-        #
-        # query = (
-        #     session.query(
-        #         Product.name.label("name"),
-        #         Category.name.label("category"),
-        #         Flavor.name.label("flavors"),
-        #         subquery.c.ingredients.label("ingredients"),
-        #         # Products.description.label("description")
-        #     ).join(Category, Product.category_id == Category.id
-        #            ).join(Flavor, Flavor.id == Product.flavor_id
-        #                   ).join(subquery, subquery.c.flavor == Flavor.name)
-        # )  # query - основной запрос для получения продуктов
-        #
-        # products: list[Product] = query.all()
         stmt = (
             select(
                 Product.id,
@@ -98,34 +54,6 @@ class ProductRepository:
         return product
 
     async def get_product_by_id(self, product_id: int) -> Product | None:
-        # sub_query = (
-        #     session.query(
-        #         Flavor.name.label("flavor"),
-        #         func.aggregate_strings(Ingredient.name, ', ').label("ingredients")
-        #     ).join(flavor_ingredients, Flavor.id == flavor_ingredients.c.flavor_id)
-        #     .join(Ingredient, Ingredient.id == flavor_ingredients.c.ingredient_id)
-        #     .group_by(Flavor.name)
-        #     .subquery()
-        # )  # subquery - подзапрос для получения ингредиентов
-        #
-        # query = (
-        #     session.query(
-        #         Product.name.label("name"),
-        #         Category.name.label("category"),
-        #         Flavor.name.label("flavors"),
-        #         sub_query.c.ingredients.label("ingredients"),
-        #         Product.description.label("description")
-        #     ).join(Category, Product.category_id == Category.id
-        #            ).join(Flavor, Flavor.id == Product.flavor_id
-        #                   ).join(sub_query, sub_query.c.flavor == Flavor.name
-        #                          ).where(Flavor.name == flavor_name)
-        # )  # query - основной запрос для получения продукта
-        #
-        #                       or
-        #
-        # product = session.query(Product).filter(Product.id == product_id).first()
-        #
-        #                       or
         product = await self.db_session.get(Product, product_id)
         return product
 

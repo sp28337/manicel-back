@@ -71,7 +71,9 @@ async def get_product_service(
 
 
 async def get_bestsellers_service(
-    bestsellers_repository: Annotated[BestsellersRepository, Depends(get_bestsellers_repository)],
+    bestsellers_repository: Annotated[
+        BestsellersRepository, Depends(get_bestsellers_repository)
+    ],
 ) -> BestsellersService:
     return BestsellersService(
         bestsellers_repository=bestsellers_repository,

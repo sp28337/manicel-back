@@ -29,9 +29,7 @@ class AuthService:
         user_data = await self.google_client.get_user_info(code=code)
 
         # -- Если юзер существует
-        if user := await self.user_repository.read_user_by_email(
-            email=user_data.email
-        ):
+        if user := await self.user_repository.read_user_by_email(email=user_data.email):
             # -- Генерируем токен доступа
             access_token = self.generate_access_token(user_id=user.id)
             return UserLoginSchema(user_id=user.id, access_token=access_token)
@@ -43,13 +41,9 @@ class AuthService:
                 google_access_token=user_data.google_access_token,
             )
             # -- И записываем в базу данных
-            created_user = await self.user_repository.create_user(
-                create_user_data
-            )
+            created_user = await self.user_repository.create_user(create_user_data)
             # -- Генерируем токен доступа
-            access_token = self.generate_access_token(
-                user_id=created_user.id
-            )
+            access_token = self.generate_access_token(user_id=created_user.id)
             return UserLoginSchema(user_id=created_user.id, access_token=access_token)
 
     async def yandex_auth(self, code: str) -> UserLoginSchema:
