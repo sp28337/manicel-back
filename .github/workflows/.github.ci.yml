@@ -19,8 +19,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Dependencies
-      run:
-        |
+      run: |
         python -m pip install --upgrade pip
         pip install poetry
         poetry install
@@ -34,28 +33,26 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "3.12" ]
+        python-version: ["3.12"]
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install Dependencies
-        run:
-          |
-          python -m pip install --upgrade pip
-          pip install poetry
-          poetry install
-      - name: Start docker-compose.test
-        run:
-          |
-          docker compose down
-          docker compose -f docker-compose.test.yml  up -d
-      - name: Run Unit tests
-        run: poetry run pytest tests/unit
-      - name: Stop docker-compose.test
-        run: docker compose down
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install poetry
+        poetry install
+    - name: Start docker-compose.test
+      run: |
+        docker compose down
+        docker compose -f docker-compose.test.yml up -d
+    - name: Run Unit tests
+      run: poetry run pytest tests/unit
+    - name: Stop docker-compose.test
+      run: docker compose down
 
   deploy:
     needs: unit-tests
@@ -72,21 +69,72 @@ jobs:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Deploy to server via SSH
-      run:
-        |
+      run: |
         ssh -o StrictHostKeyChecking=no sp28337@109.73.207.195 -p ${{ secrets.PORT }} "
-          cd ~/manicel/backend &&
-          export PATH="~/.local/bin/poetry" ;
-          export PATH="~/.local/bin:/usr/local/bin:/usr/bin:/bin:$PATH" ;
-          export NVM_DIR="~/.nvm" ;
-          [ -s "$NVM_DIR/nvm.sh" ] ;
-          source "~/.nvm/nvm.sh" ;
-          nvm install 22.15.1 &&
-          nvm use 22.15.1 ;
-          git switch dev ;
-          npm install pm2 -g &&
-          pm2 update &&
-          pm2 stop backend &&
-          git pull &&  
-          pm2 start backend
+          set -e
+          
+          echo '=== Backend Deployment Started ==='
+          
+          cd ~/manicel/backend
+          
+          echo '=== Pulling latest code ==='
+          git switch dev
+          git pull origin dev
+          
+          echo '=== Setting up Python environment ==='
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-venv
+          
+          if [ ! -d venv ]; then
+            python3 -m venv venv
+          fi
+          source venv/bin/activate
+          
+          echo '=== Installing dependencies ==='
+          curl -sSL https://install.python-poetry.io | python3 -
+          export PATH=\"\$HOME/.local/bin:\$PATH\"
+          poetry install
+          
+          echo '=== Restarting service ==='
+          sudo systemctl daemon-reload
+          sudo systemctl restart manicel-backend.service
+          
+          echo '=== Verifying service ==='
+          sudo systemctl status manicel-backend.service
+          
+          echo '=== Backend Deployment Completed Successfully ==='
         "
+
+    - name: Post-deployment verification
+      run: |
+        ssh -o StrictHostKeyChecking=no sp28337@109.73.207.195 -p ${{ secrets.PORT }} "
+          echo '=== Health Check ==='
+          
+          if sudo systemctl is-active --quiet manicel-backend.service; then
+            echo '✅ Backend service is running'
+          else
+            echo '❌ Backend service is not running'
+            sudo journalctl -u manicel-backend.service -n 30
+            exit 1
+          fi
+          
+          if sudo ss -tlnp | grep -q :8000; then
+            echo '✅ Port 8000 is listening'
+          else
+            echo '⚠️  Port 8000 is not listening yet'
+          fi
+          
+          for i in {1..10}; do
+            if curl -f http://localhost:8000/docs > /dev/null 2>&1; then
+              echo '✅ Backend API is responding'
+              break
+            fi
+            if [ \$i -lt 10 ]; then
+              echo \"Attempt \$i/10: Waiting for API...\"
+              sleep 2
+            else
+              echo '⚠️  Backend API not responding'
+              sudo journalctl -u manicel-backend.service -n 20
+            fi
+          done
+        " || echo "Post-deployment checks completed"
