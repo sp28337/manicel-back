@@ -33,26 +33,26 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12"]
+        python-version: [ "3.12" ]
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install poetry
-        poetry install
-    - name: Start docker-compose.test
-      run: |
-        docker compose down
-        docker compose -f docker-compose.test.yml up -d
-    - name: Run Unit tests
-      run: poetry run pytest tests/unit
-    - name: Stop docker-compose.test
-      run: docker compose down
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry install
+      - name: Start docker-compose.test
+        run: |
+          docker compose down
+          docker compose -f docker-compose.test.yml up -d
+      - name: Run Unit tests
+        run: poetry run pytest tests/unit
+      - name: Stop docker-compose.test
+        run: docker compose down
 
   deploy:
     needs: unit-tests
@@ -72,44 +72,54 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no sp28337@109.73.207.195 -p ${{ secrets.PORT }} "
           set -e
-          
+
           echo '=== Backend Deployment Started ==='
-          
+
+          # Navigate to backend directory
           cd ~/manicel/backend
-          
+
+          # Switch to dev branch and pull latest
           echo '=== Pulling latest code ==='
           git switch dev
           git pull origin dev
-          
+
+          # Setup Python environment
           echo '=== Setting up Python environment ==='
           sudo apt-get update -qq
-          sudo apt-get install -y python3-venv
-          
-          if [ ! -d venv ]; then
-            python3 -m venv venv
-          fi
+          sudo apt-get install -y python3-venv python3-pip
+          python3 -m venv venv
           source venv/bin/activate
-          
+
+          # Install dependencies
           echo '=== Installing dependencies ==='
-          curl -sSL https://install.python-poetry.io | python3 -
-          export PATH=\"\$HOME/.local/bin:\$PATH\"
+          pip install --upgrade pip setuptools wheel
+          pip install poetry
           poetry install
-          
+
+          # Run migrations (if needed)
+          echo '=== Running migrations ==='
+          # alembic upgrade head
+          echo 'Skipping migrations (configure as needed)'
+
+          # Restart backend service via systemd
           echo '=== Restarting service ==='
           sudo systemctl daemon-reload
           sudo systemctl restart manicel-backend.service
-          
+
+          # Verify service is running
           echo '=== Verifying service ==='
           sudo systemctl status manicel-backend.service
-          
+
           echo '=== Backend Deployment Completed Successfully ==='
         "
+    
 
     - name: Post-deployment verification
       run: |
         ssh -o StrictHostKeyChecking=no sp28337@109.73.207.195 -p ${{ secrets.PORT }} "
           echo '=== Health Check ==='
           
+          # Check if service is running
           if sudo systemctl is-active --quiet manicel-backend.service; then
             echo '✅ Backend service is running'
           else
@@ -118,23 +128,25 @@ jobs:
             exit 1
           fi
           
+          # Check if port 8000 is listening
           if sudo ss -tlnp | grep -q :8000; then
             echo '✅ Port 8000 is listening'
           else
-            echo '⚠️  Port 8000 is not listening yet'
+            echo '⚠️  Port 8000 is not listening (might be normal during startup)'
           fi
           
+          # Try to reach the API (with retry)
           for i in {1..10}; do
             if curl -f http://localhost:8000/docs > /dev/null 2>&1; then
               echo '✅ Backend API is responding'
               break
             fi
             if [ \$i -lt 10 ]; then
-              echo \"Attempt \$i/10: Waiting for API...\"
+              echo \"Attempt \$i/10: Waiting for API to start...\"
               sleep 2
             else
-              echo '⚠️  Backend API not responding'
+              echo '⚠️  Backend API not responding yet (check logs)'
               sudo journalctl -u manicel-backend.service -n 20
             fi
           done
-        " || echo "Post-deployment checks completed"
+        " || echo "Post-deployment checks completed with warnings"
