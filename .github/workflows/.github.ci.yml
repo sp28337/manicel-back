@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: ["main", "dev"]
+    branches: ["main"]
   pull_request:
-    branches: ["main", "dev"]
+    branches: ["main"]
 
 jobs:
   lint:
@@ -13,9 +13,9 @@ jobs:
       matrix:
         python-version: ["3.12"]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Dependencies
@@ -36,9 +36,9 @@ jobs:
       matrix:
         python-version: [ "3.12" ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Dependencies
@@ -78,7 +78,7 @@ jobs:
           cd ~/manicel/backend &&
           export PATH="~/.local/bin/poetry" ;
           export PATH="~/.local/bin:/usr/local/bin:/usr/bin:/bin:$PATH" ;
-          git switch dev ;
+          git switch main ;
           echo '=== Restarting service ===' &&
           sudo systemctl daemon-reload &&
           sudo systemctl stop manicel-backend.service &&
