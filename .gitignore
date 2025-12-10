@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
 tmp/
+tmp.py
 *SQLAlchemy*
 __pycache__/
 *.py[cod]
@@ -7,6 +8,7 @@ __pycache__/
 /SQLqueries
 .idea
 *.local*
+*.prod*
 
 # C extensions
 *.so

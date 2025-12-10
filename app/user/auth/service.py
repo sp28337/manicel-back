@@ -4,8 +4,13 @@ import datetime as dt
 from jose import jwt
 from jose.exceptions import JWTError
 
-from app.user.auth.clients import GoogleClient, YandexClient, MailClient
-from app.exceptions import *
+from app.user.auth.clients import GoogleClient, YandexClient
+from app.exceptions import (
+    TokenExpiredException,
+    UserIncorrectPasswordException,
+    UserNotFoundException,
+    IncorrectTokenException,
+)
 from app.user.models import UserProfile
 from app.user.repository import UserRepository
 from app.user.auth.schemas import UserLoginSchema, UserOAuthCreateSchema
@@ -18,39 +23,36 @@ class AuthService:
     settings: Settings
     google_client: GoogleClient
     yandex_client: YandexClient
-    mail_client: MailClient
 
     async def google_auth(self, code: str) -> UserLoginSchema:
-        user_data = await self.google_client.get_user_info(code=code)  # ------- Запрос в Google с полученным кодом
-        print(f"\nUSER DATA: {user_data}\n")
+        # -- Запрос в Google с полученным кодом
+        user_data = await self.google_client.get_user_info(code=code)
 
-        if user := await self.user_repository.read_user_by_email(email=user_data.email):  # Если юзер существует -
-            access_token = self.generate_access_token(user_id=user.id)  # ---------------- Генерируем токен доступа
-            print(f"\nUser: {user_data.name} LOGIN\n")
+        # -- Если юзер существует
+        if user := await self.user_repository.read_user_by_email(email=user_data.email):
+            # -- Генерируем токен доступа
+            access_token = self.generate_access_token(user_id=user.id)
             return UserLoginSchema(user_id=user.id, access_token=access_token)
-        else:
+        else:  # -- Если юзера нет - создаем юзера
             create_user_data = UserOAuthCreateSchema(
                 username=f"user_{user_data.id}",
                 email=user_data.email,
                 name=user_data.name,
                 google_access_token=user_data.google_access_token,
-            )  # -------------------------------------------------------------------- Если юзера нет - создаем юзера
-
-            created_user = await self.user_repository.create_user(create_user_data)  # -- И записываем в базу данных
-            print(f"\nUser: {user_data.name} CREATED\n")
-            access_token = self.generate_access_token(user_id=created_user.id)  # --------- Генерируем токен доступа
-            await self.mail_client.send_welcome_email(to=user_data.email)
+            )
+            # -- И записываем в базу данных
+            created_user = await self.user_repository.create_user(create_user_data)
+            # -- Генерируем токен доступа
+            access_token = self.generate_access_token(user_id=created_user.id)
             return UserLoginSchema(user_id=created_user.id, access_token=access_token)
 
     async def yandex_auth(self, code: str) -> UserLoginSchema:
         user_data = await self.yandex_client.get_user_info(code=code)
-        print(f"\n5) USER DATA FROM YANDEX: {user_data}\n")
 
-        if user := await self.user_repository.read_user_by_username(
-            username=f"{user_data.login}_{user_data.id}"
+        if user := await self.user_repository.read_user_by_email(
+            email=user_data.default_email
         ):
             access_token = self.generate_access_token(user_id=user.id)
-            print(f"\nUser: {user_data.name} LOGIN\n")
             return UserLoginSchema(user_id=user.id, access_token=access_token)
 
         create_user_data = UserOAuthCreateSchema(
@@ -60,9 +62,7 @@ class AuthService:
             yandex_access_token=user_data.yandex_access_token,
         )
         created_user = await self.user_repository.create_user(create_user_data)
-        print(f"\nUser: {user_data.name} CREATED\n")
         access_token = self.generate_access_token(user_id=created_user.id)
-        await self.mail_client.send_welcome_email(to=user_data.default_email)
         return UserLoginSchema(user_id=created_user.id, access_token=access_token)
 
     def get_google_redirect_url(self) -> str:
@@ -77,8 +77,8 @@ class AuthService:
         )
         self._validate_auth_user(user, password)
 
-        generated_access_token = self.generate_access_token(user_id=user.id)
-        return UserLoginSchema(user_id=user.id, access_token=generated_access_token)
+        access_token = self.generate_access_token(user_id=user.id, access=user.admin)
+        return UserLoginSchema(user_id=user.id, access_token=access_token)
 
     @staticmethod
     def _validate_auth_user(user: UserProfile, password: str) -> None:
@@ -87,13 +87,14 @@ class AuthService:
         if user.password != password:
             raise UserIncorrectPasswordException
 
-    def generate_access_token(self, user_id: int) -> str:
+    def generate_access_token(self, user_id: int, access: bool = False) -> str:
         expires_date_unix = (dt.datetime.now(dt.UTC) + dt.timedelta(days=7)).timestamp()
 
         access_token: str = jwt.encode(
             claims={
                 "user_id": user_id,
-                "expire": expires_date_unix
+                "expire": expires_date_unix,
+                "access": access,
             },
             key=self.settings.JWT_SECRET_KEY,
             algorithm=self.settings.JWT_ENCODE_ALHORITHM,

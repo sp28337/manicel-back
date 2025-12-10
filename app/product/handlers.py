@@ -7,48 +7,38 @@ from app.exceptions import (
     ProductNotFoundException,
     PermissionDeniedException,
 )
-from app.product.schemas import ProductSchema, CreateProductSchema, UpdtaeProductSchema, ProductCatalogSchema, BestsellerSchema
+from app.product.schemas import (
+    ProductSchema,
+    CreateProductSchema,
+    UpdtaeProductSchema,
+    ProductCatalogSchema,
+)
 from app.product.service import ProductService
 
 router = APIRouter(prefix="/products", tags=["products"])
 
 
-@router.get(path="/bestsellers", response_model=List[BestsellerSchema])
-async def read_bestsellers(
-    bestsellers_service: Annotated[ProductService, Depends(get_product_service)]
-):
-    return await bestsellers_service.get_bestsellers()
-
-
 @router.get(path="/catalog_products", response_model=List[ProductCatalogSchema])
-async def read_catalog_products(
-    product_service: Annotated[ProductService, Depends(get_product_service)]
+async def get_catalog_products(
+    product_service: Annotated[ProductService, Depends(get_product_service)],
 ):
-    return await product_service.read_catalog_products()
-
-
-@router.get(path="/search_products", response_model=List[ProductCatalogSchema])
-async def read_search_products(
-    query: str,
-    product_service: Annotated[ProductService, Depends(get_product_service)]
-):
-    return await product_service.search_products(query)
+    return await product_service.get_catalog_products()
 
 
 @router.get(path="/all", response_model=List[ProductSchema])
-async def read_products(
-    product_service: Annotated[ProductService, Depends(get_product_service)]
+async def get_products(
+    product_service: Annotated[ProductService, Depends(get_product_service)],
 ):
-    return await product_service.read_products()
+    return await product_service.get_products()
 
 
 @router.get(path="/{product_id}", response_model=ProductSchema)
-async def read_product(
+async def get_product(
     product_id: int,
     product_service: Annotated[ProductService, Depends(get_product_service)],
 ):
     try:
-        new_product: ProductSchema = await product_service.read_product(product_id)
+        new_product: ProductSchema = await product_service.get_product(product_id)
         return new_product
     except ProductNotFoundException as e:
         raise HTTPException(status_code=404, detail=e.detail)

@@ -26,12 +26,18 @@ class UserRepository:
         result = await self.db_session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def read_user_by_yandex_access_token(self, access_token: str) -> UserProfile | None:
-        stmt = select(UserProfile).where(UserProfile.yandex_access_token == access_token)
+    async def read_user_by_yandex_access_token(
+        self, access_token: str
+    ) -> UserProfile | None:
+        stmt = select(UserProfile).where(
+            UserProfile.yandex_access_token == access_token
+        )
         result = await self.db_session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def create_user(self, user_data: UserCreateSchema | UserOAuthCreateSchema) -> UserProfile:
+    async def create_user(
+        self, user_data: UserCreateSchema | UserOAuthCreateSchema
+    ) -> UserProfile:
         stmt = (
             insert(UserProfile)
             .values(user_data.model_dump(exclude_none=True))
@@ -58,6 +64,16 @@ class UserRepository:
             update(UserProfile)
             .where(UserProfile.id == user_id)
             .values(name=new_name)
+            .returning(UserProfile.id)
+        )
+        await self._execute_commit_flush(s=self.db_session, query=stmt)
+        return await self.read_user_by_id(user_id)
+
+    async def update_email(self, user_id: int, new_email: str) -> UserProfile:
+        stmt = (
+            update(UserProfile)
+            .where(UserProfile.id == user_id)
+            .values(email=new_email)
             .returning(UserProfile.id)
         )
         await self._execute_commit_flush(s=self.db_session, query=stmt)

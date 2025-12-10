@@ -1,3 +1,4 @@
+from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import async_sessionmaker
@@ -10,7 +11,7 @@ settings = Settings()
 engine = create_async_engine(
     url=settings.get_db_url,
     future=True,
-    echo=True,
+    # echo=True,
     pool_pre_ping=True,
 )
 
@@ -22,7 +23,7 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 
-async def get_async_db_session() -> AsyncSession:
+async def get_async_db_session() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionLocal() as session:
         try:
             yield session

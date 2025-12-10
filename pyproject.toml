@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "manicel"
+name = "app"
 version = "0.1.0"
 description = ""
-authors = ["Pavel Tarakanov <pavel191094@icloud.com>"]
+authors = ["Pavel Tarakanov <sp28337@yandex.ru>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -15,7 +15,6 @@ alembic = "^1.13.3"
 httpx = "^0.27.2"
 pydantic-settings = "^2.6.1"
 psycopg2-binary = "^2.9.10"
-redis = "^5.2.0"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 requests = "^2.32.3"
 asyncpg = "^0.30.0"
@@ -28,9 +27,13 @@ pytest-trio = "^0.8.0"
 pytest-twisted = "^1.14.3"
 twisted = "^24.10.0"
 pytest-factoryboy = "^2.7.0"
-flower = "^2.0.1"
-aio-pika = "^9.5.3"
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.8"
+black = "^25.1.0"
+
+[tool.ruff]
+lint.ignore = ["F403"]
 
 [build-system]
 requires = ["poetry-core"]

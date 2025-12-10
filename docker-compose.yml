@@ -1,6 +1,19 @@
 services:
+  backend:
+    container_name: backend_container
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db
+#      - redis
+    networks:
+      - manicel_network
 
   db:
+    container_name: postgres_container
     image: postgres:17.0
     restart: always
     shm_size: 128mb
@@ -12,15 +25,21 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - /home/sp28337/docker_volume/postgres:/var/lib/postgresql/data
+    networks:
+      - manicel_network
 
-  cache:
-    image: redis:7.2.4-alpine
-    restart: always
-    ports:
-      - "6379:6379"
+# ! Do not use default redis settings in prod due to high chance to get
+# miner-viruse that make your CPU up to 100% !
+#
+#  redis:
+#    container_name: redis_container
+#    image: redis:7.2.4-alpine
+#    restart: always
+#    ports:
+#      - "6379:6379"
+#    networks:
+#      - manicel_network
 
-  rabbitmq:
-    image: rabbitmq:latest
-    ports:
-      - "5672:5672"
-      - "15672:15672"
+networks:
+  manicel_network:
+    external: true

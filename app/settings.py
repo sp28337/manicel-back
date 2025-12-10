@@ -9,10 +9,6 @@ class Settings(BaseSettings):
     DB_DRIVER: str = ""
     DB_NAME: str = ""
 
-    CACHE_HOST: str = ""
-    CACHE_PORT: int = 7777
-    CACHE_DB: int = 0
-
     JWT_SECRET_KEY: str = ""
     JWT_ENCODE_ALHORITHM: str = "HS256"
 
@@ -26,11 +22,11 @@ class Settings(BaseSettings):
     YANDEX_REDIRECT_URI: str = ""
     YANDEX_TOKEN_URI: str = "https://oauth.yandex.ru/token"
 
-    AMQP_URL: str = "amqp://guest:guest@localhost:5672//"
+    CALLBACK_REDIRECT_URI: str = ""
+    COOKIES_DOMAIN: str = ""
 
-    model_config = {
-        "env_file": ".local.env"
-    }
+    # model_config = SettingsConfigDict(env_file=f"../.{os.getenv("ENVIRONMENT")}.env", env_file_encoding="utf-8")
+    model_config = {"env_file": ".local.env"}
 
     @property
     def get_db_url(self):

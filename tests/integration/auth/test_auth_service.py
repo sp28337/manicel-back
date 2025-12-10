@@ -9,7 +9,10 @@ from tests.fixtures.user.models import EXISTS_GOOGLE_USER_ID, EXISTS_GOOGLE_EMAI
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_google_auth__login_exist_user(auth_service, get_db_session):
+async def test_google_auth__login_exist_user(
+    auth_service,
+    get_db_session,
+):
     code = "test_code"
     stmt = insert(UserProfile).values(
         id=EXISTS_GOOGLE_USER_ID,
@@ -26,7 +29,10 @@ async def test_google_auth__login_exist_user(auth_service, get_db_session):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_google_auth__login_not_exist_user(auth_service, get_db_session):
+async def test_google_auth__login_not_exist_user(
+    auth_service,
+    get_db_session,
+):
     code = "test_code"
 
     users = (await get_db_session.execute(select(UserProfile))).scalars().all()
@@ -42,7 +48,10 @@ async def test_google_auth__login_not_exist_user(auth_service, get_db_session):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_base_login__success(auth_service, get_db_session):
+async def test_base_login__success(
+    auth_service,
+    get_db_session,
+):
     username = "test_username"
     password = "test_password"
     email = "test_email"
@@ -50,7 +59,7 @@ async def test_base_login__success(auth_service, get_db_session):
     stmt = insert(UserProfile).values(
         username=username,
         password=password,
-        email=email
+        email=email,
     )
     await get_db_session.execute(stmt)
     await get_db_session.commit()
