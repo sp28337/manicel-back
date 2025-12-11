@@ -1,25 +1,8 @@
 import os
-from pathlib import Path
-
-from dotenv import load_dotenv
-
-# Устанавливаем рабочую директорию явно
-BASE_DIR = Path(__file__).resolve().parent
-
-# Загружаем основной .env файл
-env_file = BASE_DIR / ".env"
-if env_file.exists():
-    load_dotenv(env_file)
-
-# Загружаем специфичный для окружения .env файл
-environment = os.getenv("ENVIRONMENT", "local")
-specific_env_file = BASE_DIR / f".{environment}.env"
-if specific_env_file.exists():
-    load_dotenv(specific_env_file, override=True)
 
 # Конфигурация Gunicorn
 bind = os.getenv("GUNICORN_BIND", "0.0.0.0:8000")
-workers = int(os.getenv("GUNICORN_WORKERS", 4))
+workers = int(os.getenv("GUNICORN_WORKERS", 1))
 worker_class = "uvicorn.workers.UvicornWorker"
 timeout = 120
 keepalive = 5
