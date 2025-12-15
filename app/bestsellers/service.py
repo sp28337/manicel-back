@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from app.bestsellers.repository import BestsellersRepository
 from app.bestsellers.schemas import BestsellersSchema
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class BestsellersService:

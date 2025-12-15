@@ -1,7 +1,5 @@
 import logging
 
-
-from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import FastAPI, Depends
@@ -14,25 +12,15 @@ from app.user.handlers import router as user_router
 from app.user.auth.handlers import router as auth_router
 from app.dependencies import get_product_repository
 from app.product.repository import ProductRepository
+from logging_setup import setup_logging
 
 routers = [product_router, user_router, auth_router, bestsellers_router, search_router]
 
+setup_logging()
 
-logging.basicConfig(
-    # filename="py_log.log",
-    level=logging.INFO,
-    format=" * [%(asctime)s] [%(levelname)s] %(message)s",
-    datefmt="%y-%m-%d %H:%M:%S",
-    filemode="a",
-)
+logger = logging.getLogger(__name__)
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    yield
-
-
-app = FastAPI(title="MANICEL", lifespan=lifespan)
+app = FastAPI(title="MANICEL")
 
 origins = [
     "http://frontend:3000",
