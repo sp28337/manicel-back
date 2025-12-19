@@ -1,5 +1,6 @@
 import logging
 import time
+
 from fastapi import Request
 
 logger = logging.getLogger("http")

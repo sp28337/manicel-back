@@ -1,12 +1,9 @@
 from typing import Annotated, List
+
 from fastapi import APIRouter, Depends
 
 from app.dependencies import get_bestsellers_service
-
-from app.bestsellers.schemas import (
-    BestsellersSchema,
-)
-
+from app.bestsellers.schemas import BestsellersSchema
 from app.bestsellers.service import BestsellersService
 
 router = APIRouter(prefix="/bestsellers", tags=["bestsellers"])

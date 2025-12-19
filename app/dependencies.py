@@ -1,26 +1,24 @@
 from typing import Annotated
 
 from fastapi import Depends, security, Security, HTTPException, status
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.user.auth.clients import GoogleClient, YandexClient
 from app.exceptions import (
     TokenExpiredException,
     IncorrectTokenException,
 )
+from app.settings import get_settings
 from app.infrastructure.database_accessor import get_async_db_session
 from app.product.repository import ProductRepository
-from app.search.repository import SearchRepository
+from app.product.service import ProductService
 from app.bestsellers.repository import BestsellersRepository
 from app.bestsellers.service import BestsellersService
-from app.product.service import ProductService
+from app.search.repository import SearchRepository
 from app.search.service import SearchService
+from app.user.auth.clients import GoogleClient, YandexClient
 from app.user.auth.service import AuthService
 from app.user.service import UserService
 from app.user.repository import UserRepository
-
-from app.settings import get_settings
 
 settings = get_settings()
 

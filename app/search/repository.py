@@ -2,6 +2,7 @@ import logging
 
 from sqlalchemy import select, or_, cast, String
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.product.models import Product, Category
 from app.search.schemas import SearchSchema
 

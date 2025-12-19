@@ -1,4 +1,5 @@
 from typing import Annotated, List
+
 from fastapi import APIRouter, Depends
 
 from app.dependencies import get_search_service

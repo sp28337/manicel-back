@@ -1,14 +1,13 @@
 import logging
-
 from dataclasses import dataclass
 
+from app.product.repository import ProductRepository
+from app.user.repository import UserRepository
 from app.exceptions import (
     ProductNotFoundException,
     ProductAlreadyExistsException,
     PermissionDeniedException,
 )
-from app.product.repository import ProductRepository
-from app.user.repository import UserRepository
 from app.product.schemas import (
     ProductSchema,
     CreateProductSchema,

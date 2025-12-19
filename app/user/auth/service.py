@@ -4,13 +4,13 @@ import datetime as dt
 from jose import jwt
 from jose.exceptions import JWTError
 
-from app.user.auth.clients import GoogleClient, YandexClient
 from app.exceptions import (
     TokenExpiredException,
     UserIncorrectPasswordException,
     UserNotFoundException,
     IncorrectTokenException,
 )
+from app.user.auth.clients import GoogleClient, YandexClient
 from app.user.models import UserProfile
 from app.user.repository import UserRepository
 from app.user.auth.schemas import UserLoginSchema, UserOAuthCreateSchema

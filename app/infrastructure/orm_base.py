@@ -1,6 +1,6 @@
-import sqlalchemy
 import enum
 
+import sqlalchemy
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.ext.asyncio import AsyncAttrs
 
