@@ -20,7 +20,9 @@ from app.user.auth.service import AuthService
 from app.user.service import UserService
 from app.user.repository import UserRepository
 
-from app.settings import Settings
+from app.settings import get_settings
+
+settings = get_settings()
 
 
 # Get repositories ----------------------------------------------------------------------------------------------------
@@ -52,11 +54,11 @@ async def get_user_repository(
 
 
 async def get_google_client() -> GoogleClient:
-    return GoogleClient(settings=Settings())
+    return GoogleClient(settings=settings)
 
 
 async def get_yandex_client() -> YandexClient:
-    return YandexClient(settings=Settings())
+    return YandexClient(settings=settings)
 
 
 # Get services --------------------------------------------------------------------------------------------------------
@@ -95,7 +97,7 @@ async def get_auth_service(
 ) -> AuthService:
     return AuthService(
         user_repository=user_repository,
-        settings=Settings(),
+        settings=settings,
         google_client=google_client,
         yandex_client=yandex_client,
     )
