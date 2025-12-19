@@ -16,6 +16,8 @@ from app.product.schemas import (
     ProductCatalogSchema,
 )
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class ProductService:

@@ -8,6 +8,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import text
 from app.product.models import Product, Category
 
+logger = logging.getLogger(__name__)
+
 
 class ProductRepository:
     def __init__(self, db_session: AsyncSession):
