@@ -27,7 +27,7 @@ jobs:
     - name: Black
       run: poetry run black app
     - name: Ruff
-      run: poetry run ruff check app
+      run: poetry run ruff check app --check --diff
 
   unit-tests:
     needs: lint
