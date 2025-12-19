@@ -1,5 +1,6 @@
-import httpx
 from dataclasses import dataclass
+
+import httpx
 
 from app.user.auth.schemas import GoogleUserData
 from app.settings import Settings

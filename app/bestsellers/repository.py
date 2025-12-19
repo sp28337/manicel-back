@@ -1,7 +1,7 @@
 from sqlalchemy import select, func
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bestsellers.schemas import BestsellersSchema
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.product.models import Product, Category, Flavor, Ingredient
 
 

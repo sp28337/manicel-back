@@ -1,11 +1,11 @@
 import logging
 
 from fastapi import HTTPException, status
-from sqlalchemy import update, select, delete
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.product.schemas import ProductCatalogSchema
+from sqlalchemy import update, select, delete, text
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.product.schemas import ProductCatalogSchema
 from app.product.models import Product, Category
 
 logger = logging.getLogger(__name__)

@@ -1,7 +1,7 @@
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.dependencies import get_user_service, get_request_user_id
 from app.exceptions import (
     UserNameAlreadyExistsException,
     UserEmailAlreadyExistsException,
@@ -17,6 +17,7 @@ from app.user.schemas import (
     UserUpdateEmailSchema,
     UserUpdateUsernameSchema,
 )
+from app.dependencies import get_user_service, get_request_user_id
 from app.user.auth.schemas import UserLoginSchema
 from app.user.service import UserService
 

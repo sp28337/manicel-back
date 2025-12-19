@@ -1,5 +1,4 @@
 import logging
-
 from dataclasses import dataclass
 
 from app.search.repository import SearchRepository

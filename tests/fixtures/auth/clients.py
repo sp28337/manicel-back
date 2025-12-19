@@ -1,6 +1,6 @@
-import pytest_asyncio
-
 from dataclasses import dataclass
+
+import pytest_asyncio
 from faker import Factory as FakerFactory
 
 from app.settings import Settings

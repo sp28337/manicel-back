@@ -1,8 +1,12 @@
 from typing import AsyncGenerator
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.ext.asyncio import async_sessionmaker
+
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import (
+    create_async_engine,
+    AsyncSession,
+    async_sessionmaker,
+)
+
 from app.settings import get_settings
 
 

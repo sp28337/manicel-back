@@ -1,6 +1,6 @@
-import pytest_asyncio
-
 from dataclasses import dataclass
+
+import pytest_asyncio
 
 from app.user.schemas import UserCreateSchema
 from tests.fixtures.user.models import UserProfileFactory

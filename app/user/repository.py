@@ -1,4 +1,13 @@
-from sqlalchemy import insert, select, update, delete, Select, Insert, Update, Delete
+from sqlalchemy import (
+    insert,
+    select,
+    update,
+    delete,
+    Select,
+    Insert,
+    Update,
+    Delete,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.user.models import UserProfile

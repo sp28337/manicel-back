@@ -1,7 +1,9 @@
 from typing import Annotated, List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.dependencies import get_product_service, get_request_user_id
+from app.product.service import ProductService
 from app.exceptions import (
     ProductAlreadyExistsException,
     ProductNotFoundException,
@@ -13,7 +15,6 @@ from app.product.schemas import (
     UpdtaeProductSchema,
     ProductCatalogSchema,
 )
-from app.product.service import ProductService
 
 router = APIRouter(prefix="/products", tags=["products"])
 
