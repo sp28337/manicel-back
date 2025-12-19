@@ -1,8 +1,20 @@
-from pydantic_settings import BaseSettings
+from functools import lru_cache
+from pydantic import BaseModel
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class CORSSettings(BaseModel):
+    allow_credentials: bool = True
+    allow_methods: list[str] = ["*"]
+    allow_headers: list[str] = ["*"]
+
+    PROD_URL: str = ""
+    DEV_URL: str = ""
+    FRONT_URL: str = ""
 
 
 class Settings(BaseSettings):
-    ENV: str = ""
+    ENV: str = "dev"
 
     DB_HOST: str = ""
     DB_PORT: int = 7777
@@ -27,8 +39,18 @@ class Settings(BaseSettings):
     CALLBACK_REDIRECT_URI: str = ""
     COOKIES_DOMAIN: str = ""
 
-    # model_config = SettingsConfigDict(env_file=f"../.{os.getenv("ENVIRONMENT")}.env", env_file_encoding="utf-8")
-    model_config = {"env_file": ".local.env"}
+    GUNICORN_BIND: str = ""
+    GUNICORN_WORKERS: int = 1
+
+    CORS: CORSSettings = CORSSettings()
+
+    model_config = SettingsConfigDict(
+        case_sensitive=False,
+        env_file=".env",
+        env_file_encoding="utf-8",
+        env_nested_delimiter="__",
+        # extra="ignore",
+    )
 
     @property
     def get_db_url(self):
@@ -41,3 +63,8 @@ class Settings(BaseSettings):
     @property
     def yandex_redirect_url(self):
         return f"https://oauth.yandex.ru/authorize?response_type=code&client_id={self.YANDEX_CLIENT_ID}&redirect_uri={self.YANDEX_REDIRECT_URI}"
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()

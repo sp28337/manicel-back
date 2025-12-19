@@ -1,4 +1,5 @@
 import logging
+from contextlib import asynccontextmanager
 
 from typing import Annotated
 
@@ -12,28 +13,55 @@ from app.user.handlers import router as user_router
 from app.user.auth.handlers import router as auth_router
 from app.dependencies import get_product_repository
 from app.product.repository import ProductRepository
-from logging_setup import setup_logging
+from app.logging_setup import setup_logging
+from app.middleware.logging_setup import logging_middleware
+from app.settings import get_settings
 
-routers = [product_router, user_router, auth_router, bestsellers_router, search_router]
+s = get_settings()
+is_prod = s.ENV == "prod"
 
 setup_logging()
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="MANICEL")
+routers = [
+    product_router,
+    user_router,
+    auth_router,
+    bestsellers_router,
+    search_router,
+]
 
-origins = [
-    "http://frontend:3000",
-    "http://localhost:3000",
-    "https://manicel.ru",
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("Application startup")
+    yield
+    logger.info("Application shutdown")
+
+
+app = FastAPI(
+    title="MANICEL",
+    lifespan=lifespan,
+    docs_url=None if is_prod else "/docs",
+    redoc_url=None if is_prod else "/redoc",
+    openapi_url=None if is_prod else "/openapi.json",
+)
+
+app.middleware("http")(logging_middleware)
+
+allowed_origins = [
+    s.CORS.FRONT_URL,
+    s.CORS.DEV_URL,
+    s.CORS.PROD_URL,
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=[o for o in allowed_origins if o],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=s.CORS.allow_methods,
+    allow_headers=s.CORS.allow_headers,
 )
 
 for router in routers:

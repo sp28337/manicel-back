@@ -1,55 +1,70 @@
 import logging
+import sys
+from logging.config import dictConfig
 
-from logging.handlers import RotatingFileHandler
-from settings import Settings
-
-s = Settings()
+from app.settings import get_settings
 
 
-def setup_logging():
-    """
-    Unified logging setup for dev and prod.
+class JsonFormatter(logging.Formatter):
+    def format(self, record: logging.LogRecord) -> str:
+        log = {
+            "timestamp": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+        }
 
-    ENV values:
-    - ENV=dev  -> console + file, DEBUG
-    - ENV=prod -> console only, INFO
-    """
+        if record.exc_info:
+            log["exception"] = self.formatException(record.exc_info)
 
-    env = s.ENV
+        if hasattr(record, "extra"):
+            log.update(record.extra)
 
-    # --- format ---
-    log_format = "%(asctime)s " "%(levelname)s " "[%(name)s] " "%(message)s"
+        return __import__("json").dumps(log, ensure_ascii=False)
 
-    date_format = "%Y-%m-%d %H:%M:%S"
 
-    handlers: list[logging.Handler] = []
+def setup_logging() -> None:
+    settings = get_settings()
+    is_prod = settings.ENV == "prod"
 
-    # --- console (always) ---
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(logging.Formatter(log_format, datefmt=date_format))
-    handlers.append(console_handler)
+    handlers = {
+        "default": {
+            "class": "logging.StreamHandler",
+            "stream": sys.stdout,
+            "formatter": "json" if is_prod else "default",
+        }
+    }
 
-    # --- file (dev only) ---
-    if env == "dev":
-        file_handler = RotatingFileHandler(
-            "app.log",
-            maxBytes=10 * 1024 * 1024,  # 10 MB
-            backupCount=5,
-        )
-        file_handler.setFormatter(logging.Formatter(log_format, datefmt=date_format))
-        handlers.append(file_handler)
+    formatters = {
+        "default": {
+            "format": "%(asctime)s %(levelname)s [%(name)s] %(message)s",
+        },
+        "json": {
+            "()": JsonFormatter,
+        },
+    }
 
-    # --- root logger ---
-    logging.basicConfig(
-        level=logging.DEBUG if env == "dev" else logging.INFO,
-        handlers=handlers,
-        force=True,  # IMPORTANT for gunicorn/uvicorn
+    dictConfig(
+        {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "formatters": formatters,
+            "handlers": handlers,
+            "root": {
+                "level": "INFO" if is_prod else "DEBUG",
+                "handlers": ["default"],
+            },
+            "loggers": {
+                "uvicorn.access": {"level": "WARNING"},
+                "uvicorn.error": {"level": "INFO"},
+                "gunicorn.error": {"level": "INFO"},
+                "gunicorn.access": {"level": "WARNING"},
+                "asyncio": {"level": "WARNING"},
+            },
+        }
     )
 
-    # --- silence noisy libraries ---
-    logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
-    logging.getLogger("uvicorn.error").setLevel(logging.INFO)
-    logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
-    logging.getLogger("asyncio").setLevel(logging.WARNING)
-
-    logging.getLogger(__name__).info("Logging initialized (env=%s)", env)
+    logging.getLogger(__name__).info(
+        "Logging initialized",
+        extra={"extra": {"env": settings.ENV}},
+    )
