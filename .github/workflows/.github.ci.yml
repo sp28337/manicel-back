@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD Backend
 
 on:
   push:
@@ -6,75 +6,132 @@ on:
   pull_request:
     branches: ["main"]
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   lint:
+    name: Lint & Code Quality
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.10.12"
+          cache: "pip"
 
-      - uses: actions/cache@v4
+      - name: Install Poetry
+        run: pip install poetry==1.8.3
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
         with:
-          path: ~/.cache/pypoetry
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
           key: poetry-${{ hashFiles('poetry.lock') }}
 
-      - run: |
-          pip install poetry
-          poetry install --no-root
+      - name: Install dependencies
+        run: poetry install --no-root
 
-      - run: poetry run black app --check
-      - run: poetry run ruff check app
+      - name: Run Black formatter check
+        run: poetry run black app --check --diff
+
+      - name: Run Ruff linter
+        run: poetry run ruff check app --diff
 
   tests:
+    name: Unit Tests
     needs: lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.10.12"
+          cache: "pip"
 
-      - run: |
-          pip install poetry
-          poetry install --no-root
+      - name: Install Poetry
+        run: pip install poetry==1.8.3
 
-      - run: docker compose -f docker-compose.test.yml up -d
-      - run: poetry run pytest tests/unit
-      - run: docker compose down -v
+      - name: Install dependencies
+        run: poetry install --no-root
+
+      - name: Start test services
+        run: docker compose -f docker-compose.test.yml up -d --wait
+
+      - name: Run unit tests
+        run: poetry run pytest tests/unit -v
+
+      - name: Stop test services
+        if: always()
+        run: docker compose -f docker-compose.test.yml down -v
 
   deploy:
+    name: Deploy to Production
     needs: tests
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: manicel
+    permissions:
+      contents: read
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.9.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          port: ${{ secrets.PORT }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -euo pipefail
 
-    - name: Deploy to server via SSH
-      run:
-        |
-        ssh -o StrictHostKeyChecking=no sp28337@109.73.207.195 -p ${{ secrets.PORT }} "
-          cd ~/manicel/backend &&
-          export PATH="~/.local/bin/poetry" ;
-          export PATH="~/.local/bin:/usr/local/bin:/usr/bin:/bin:$PATH" ;
-          git switch main ;
-          echo '=== Restarting service ===' &&
-          sudo systemctl daemon-reload &&
-          sudo systemctl stop manicel-backend.service &&
-          git pull &&
-          sudo systemctl start manicel-backend.service &&
-          echo '=== Verifying service ===' &&
-          sudo systemctl status manicel-backend.service
-        "
+            echo "🚀 Starting deployment..."
+
+            cd ~/manicel/backend || { echo "❌ Failed to change directory"; exit 1; }
+
+            export PATH="$HOME/.local/bin:$PATH"
+
+            git fetch origin main || { echo "❌ Failed to fetch"; exit 1; }
+            git checkout main || { echo "❌ Failed to checkout"; exit 1; }
+            git pull origin main || { echo "❌ Failed to pull"; exit 1; }
+
+            echo "📦 Pulling latest code..."
+
+            echo "🔄 Restarting service..."
+            sudo systemctl daemon-reload || { echo "❌ Failed to reload systemd"; exit 1; }
+            sudo systemctl restart manicel-backend.service || { echo "❌ Failed to restart"; exit 1; }
+
+            echo "⏳ Waiting for service to start..."
+            sleep 3
+
+            if ! sudo systemctl is-active --quiet manicel-backend.service; then
+              echo "❌ Service failed to start!"
+              sudo journalctl -u manicel-backend.service -n 50 --no-pager
+              exit 1
+            fi
+
+            echo "🏥 Running health check..."
+            if ! curl -sf http://localhost:8000/app/ping > /dev/null 2>&1; then
+              echo "❌ Health check failed!"
+              exit 1
+            fi
+
+            echo "✅ Deployment successful!"
