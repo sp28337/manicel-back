@@ -1,15 +1,21 @@
-name: CI
+name: CI/CD Backend
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+
+permissions:
+  contents: read
+  pull-requests: read
 
 jobs:
   lint:
-    name: Lint & Format
+    name: Lint & Code Quality
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -35,16 +41,18 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-root
 
-      - name: Run Black
-        run: poetry run black app --check
+      - name: Run Black formatter check
+        run: poetry run black app --check --diff
 
-      - name: Run Ruff
-        run: poetry run ruff check app
+      - name: Run Ruff linter
+        run: poetry run ruff check app --diff
 
   tests:
-    name: Unit tests
+    name: Unit Tests
     needs: lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -66,17 +74,20 @@ jobs:
         run: docker compose -f docker-compose.test.yml up -d --wait
 
       - name: Run unit tests
-        run: poetry run pytest tests/unit
+        run: poetry run pytest tests/unit -v
 
       - name: Stop test services
         if: always()
         run: docker compose -f docker-compose.test.yml down -v
 
   deploy:
-    name: Deploy to production
+    name: Deploy to Production
     needs: tests
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: manicel
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -92,26 +103,35 @@ jobs:
           script: |
             set -euo pipefail
 
-            echo "🚀 Starting deployment"
+            echo "🚀 Starting deployment..."
 
-            cd ~/manicel/backend
+            cd ~/manicel/backend || { echo "❌ Failed to change directory"; exit 1; }
 
             export PATH="$HOME/.local/bin:$PATH"
 
-            git fetch origin
-            git checkout main
-            git pull origin main
+            git fetch origin main || { echo "❌ Failed to fetch"; exit 1; }
+            git checkout main || { echo "❌ Failed to checkout"; exit 1; }
+            git pull origin main || { echo "❌ Failed to pull"; exit 1; }
 
-            sudo systemctl daemon-reload
-            sudo systemctl restart manicel-backend.service
+            echo "📦 Pulling latest code..."
 
-            echo "⏳ Waiting for service..."
+            echo "🔄 Restarting service..."
+            sudo systemctl daemon-reload || { echo "❌ Failed to reload systemd"; exit 1; }
+            sudo systemctl restart manicel-backend.service || { echo "❌ Failed to restart"; exit 1; }
+
+            echo "⏳ Waiting for service to start..."
             sleep 3
 
             if ! sudo systemctl is-active --quiet manicel-backend.service; then
-              echo "❌ Service failed to start"
+              echo "❌ Service failed to start!"
               sudo journalctl -u manicel-backend.service -n 50 --no-pager
               exit 1
             fi
 
-            echo "✅ Deployment successful"
+            echo "🏥 Running health check..."
+            if ! curl -sf http://localhost:8000/app/ping > /dev/null 2>&1; then
+              echo "❌ Health check failed!"
+              exit 1
+            fi
+
+            echo "✅ Deployment successful!"
