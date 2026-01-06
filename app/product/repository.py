@@ -15,7 +15,7 @@ class ProductRepository:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
 
-    async def ping_db(self) -> None:
+    async def ping_db(self) -> str:
         async with self.db_session as session:
             try:
                 await session.execute(text("SELECT 1"))
@@ -24,7 +24,7 @@ class ProductRepository:
                     status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                     detail="Database is not available",
                 )
-            return {"text": "db is working"}
+            return "db is working"
 
     async def get_products(self) -> list[Product] | None:
         stmt = select(Product).order_by(Product.id)
