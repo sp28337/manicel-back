@@ -76,4 +76,5 @@ async def ping_app():
 async def ping_db(
     task_repository: Annotated[ProductRepository, Depends(get_product_repository)],
 ):
-    await task_repository.ping_db()
+    result = await task_repository.ping_db()
+    return {"status": "ok", "result": result}
