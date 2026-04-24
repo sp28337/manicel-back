@@ -6,6 +6,8 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.search.handlers import router as search_router
+from app.crm.handlers import router as crm_router
+from app.admin.handlers import router as admin_router
 from app.bestsellers.handlers import router as bestsellers_router
 from app.user.handlers import router as user_router
 from app.user.auth.handlers import router as auth_router
@@ -29,6 +31,8 @@ routers = [
     auth_router,
     bestsellers_router,
     search_router,
+    crm_router,
+    admin_router,
 ]
 
 
