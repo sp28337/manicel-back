@@ -19,6 +19,10 @@ from app.user.auth.clients import GoogleClient, YandexClient
 from app.user.auth.service import AuthService
 from app.user.service import UserService
 from app.user.repository import UserRepository
+from app.crm.repository import CRMRepository
+from app.crm.service import CRMService
+from app.admin.repository import AdminRepository
+from app.admin.service import AdminService
 
 settings = get_settings()
 
@@ -46,6 +50,18 @@ async def get_user_repository(
     db_session: Annotated[AsyncSession, Depends(get_async_db_session)],
 ) -> UserRepository:
     return UserRepository(db_session=db_session)
+
+
+async def get_crm_repository(
+    db_session: Annotated[AsyncSession, Depends(get_async_db_session)],
+) -> CRMRepository:
+    return CRMRepository(db_session=db_session)
+
+
+async def get_admin_repository(
+    db_session: Annotated[AsyncSession, Depends(get_async_db_session)],
+) -> AdminRepository:
+    return AdminRepository(db_session=db_session)
 
 
 # Get clients ---------------------------------------------------------------------------------------------------------
@@ -106,6 +122,23 @@ async def get_user_service(
     auth_service: Annotated[AuthService, Depends(get_auth_service)],
 ) -> UserService:
     return UserService(user_repository=user_repository, auth_service=auth_service)
+
+
+async def get_crm_service(
+    crm_repository: Annotated[CRMRepository, Depends(get_crm_repository)],
+    user_repository: Annotated[UserRepository, Depends(get_user_repository)],
+) -> CRMService:
+    return CRMService(crm_repository=crm_repository, user_repository=user_repository)
+
+
+async def get_admin_service(
+    admin_repository: Annotated[AdminRepository, Depends(get_admin_repository)],
+    user_repository: Annotated[UserRepository, Depends(get_user_repository)],
+) -> AdminService:
+    return AdminService(
+        admin_repository=admin_repository,
+        user_repository=user_repository,
+    )
 
 
 # Authorization -------------------------------------------------------------------------------------------------------

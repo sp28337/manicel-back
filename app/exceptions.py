@@ -32,3 +32,7 @@ class ProductAlreadyExistsException(Exception):
 
 class PermissionDeniedException(Exception):
     detail = "Permission denied"
+
+
+class LeadNotFoundException(Exception):
+    detail = "Lead not found"

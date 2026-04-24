@@ -13,6 +13,7 @@ from app.settings import Settings
 from app.infrastructure.orm_base import Base
 from app.product.models import *
 from app.user.models import *
+from app.crm.models import *
 
 settings = Settings()
 
